@@ -1,4 +1,4 @@
-package ru.hse.anstkras.terraformkt
+package io.terraformkt.utils
 
 /**
  * Unlink is used to restyle old `"${ref}"` style refs to Terraform 12 style `ref`

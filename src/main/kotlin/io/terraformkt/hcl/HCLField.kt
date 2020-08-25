@@ -1,8 +1,14 @@
-package ru.hse.anstkras.terraformkt
+package io.terraformkt.hcl
+
+import io.terraformkt.utils.isLink
+import io.terraformkt.utils.link
+import io.terraformkt.utils.unlink
+import io.terraformkt.utils.withIndent
 
 
 /** Field of HCL entity */
-sealed class HCLField<T : Any>(override val hcl_name: String, val inner: Boolean, private val entity: HCLEntity, var value: T?) : HCLNamed, HCLRender {
+sealed class HCLField<T : Any>(override val hcl_name: String, val inner: Boolean, private val entity: HCLEntity, var value: T?) : HCLNamed,
+    HCLRender {
     override val renderable: Boolean
         get() = !inner && value != null
 

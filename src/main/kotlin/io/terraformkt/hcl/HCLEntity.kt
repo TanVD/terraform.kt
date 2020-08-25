@@ -1,5 +1,6 @@
-package ru.hse.anstkras.terraformkt
+package io.terraformkt.hcl
 
+import io.terraformkt.utils.withIndent
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0

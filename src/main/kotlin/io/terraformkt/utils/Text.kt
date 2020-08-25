@@ -1,4 +1,4 @@
-package ru.hse.anstkras.terraformkt
+package io.terraformkt.utils
 
 object Text {
     private val camelCaseRegex = Regex("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])")

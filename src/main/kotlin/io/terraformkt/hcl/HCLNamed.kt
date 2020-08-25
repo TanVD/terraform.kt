@@ -1,4 +1,4 @@
-package ru.hse.anstkras.terraformkt
+package io.terraformkt.hcl
 
 /** Element of HCL that can be referenced */
 interface HCLNamed {
