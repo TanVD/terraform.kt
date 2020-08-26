@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-
     implementation("com.squareup", "kotlinpoet", "1.6.0")
+    implementation("com.squareup.moshi", "moshi", "1.8.0")
+    implementation("com.squareup.moshi", "moshi-kotlin", "1.8.0")
 }
