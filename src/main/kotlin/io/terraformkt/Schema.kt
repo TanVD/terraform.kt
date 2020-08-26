@@ -1,4 +1,4 @@
-package io.terraformkt.hcl
+package io.terraformkt
 
 data class Schema (
     val format_version : Double,

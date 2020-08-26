@@ -1,8 +1,6 @@
 package io.terraformkt
 
 import com.squareup.kotlinpoet.*
-import io.terraformkt.hcl.Json
-import io.terraformkt.hcl.Schema
 import java.io.File
 
 fun main() {
