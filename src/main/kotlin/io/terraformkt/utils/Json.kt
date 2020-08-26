@@ -1,4 +1,4 @@
-package io.terraformkt
+package io.terraformkt.utils
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

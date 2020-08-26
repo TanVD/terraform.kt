@@ -13,12 +13,12 @@ import kotlin.reflect.jvm.isAccessible
  */
 open class HCLEntity(
     val fields: LinkedHashSet<HCLField<*>> = LinkedHashSet(),
-    val inner: LinkedHashSet<HCLEntity> = LinkedHashSet(),
+    val computed: LinkedHashSet<HCLEntity> = LinkedHashSet(),
     open val owner: HCLNamed? = null
 ) : HCLRender {
     override val renderable: Boolean = true
 
-    override fun render(): String = (fields.filter { it.renderable } + inner).joinToString(separator = "\n") {
+    override fun render(): String = (fields.filter { it.renderable } + computed).joinToString(separator = "\n") {
         it.render()
     }
 
@@ -64,7 +64,7 @@ open class HCLEntity(
     }
 
     fun <T : Inner> inner(entity: T) {
-        inner.add(entity)
+        computed.add(entity)
     }
 
     fun int(name: String? = null, inner: Boolean = false, default: Int? = null): FieldProvider<Int, HCLIntField> {
