@@ -33,27 +33,16 @@ fun generateFiles(path: String, resources: Map<String, Resource>, resourceType: 
     }
     for (resourceName in resources.keys) {
         val className = snakeToCamelCase(resourceName)
+
         val resourceClassBuilder = TypeSpec.classBuilder(className).primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter("id", String::class).build()
-        ).addKdoc("""Terraform $resourceName resource.
-            | 
-            | @see <a href="https://www.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
-        """.trimMargin())
+        ).addClassKDoc(resourceName)
 
-        when (resourceType) {
-            ResourceType.RESOURCE -> {
-                resourceClassBuilder.superclass(TFResource::class)
-            }
-            ResourceType.DATA -> {
-                resourceClassBuilder.superclass(TFData::class)
-            }
-            else -> {
-                throw IllegalStateException("Unsupported resource type")
-            }
-        }
+        resourceClassBuilder
+            .addSuperClass(resourceType)
+            .addSuperclassConstructorParameter("id").addSuperclassConstructorParameter("\"$resourceName\"")
 
-        resourceClassBuilder.addSuperclassConstructorParameter("id").addSuperclassConstructorParameter("\"$resourceName\"")
         for ((attrName, attr) in resources[resourceName]!!.block.attributes) {
             if (attr.containsKey("type") && attr["type"] is String) {
                 val type = attr["type"] as String
@@ -66,26 +55,12 @@ fun generateFiles(path: String, resources: Map<String, Resource>, resourceType: 
                     .delegate(typeToDelegate(type, isComputed))
                 if (attr.containsKey("description")) {
                     propertyBuilder.addKdoc(attr["description"] as String)
-                    println(className)
                 }
 
-                resourceClassBuilder.addProperty(
-                    propertyBuilder.build()
-                )
+                resourceClassBuilder.addProperty(propertyBuilder.build())
             }
         }
-        resourceClassBuilder.addFunction(
-            FunSpec.builder(resourceName)
-                .addParameter("id", String::class)
-                .addParameter(
-                    "configure", LambdaTypeName.get(
-                        returnType = UNIT,
-                        receiver = TypeVariableName(className)
-                    )
-                )
-                .addStatement("%N(id).apply(configure)", className)
-                .build()
-        )
+        resourceClassBuilder.addClosureFunction(resourceName, className)
         File("$baseDirectoryName/$path/$className.kt").writeText(resourceClassBuilder.build().toString(), Charsets.UTF_8)
     }
 }
@@ -111,8 +86,44 @@ fun typeToKotlinType(type: String): TypeName {
     }
 }
 
-fun removeProviderPrefix(resourceName : String) : String {
+fun removeProviderPrefix(resourceName: String): String {
     return resourceName.substringAfter("_")
+}
+
+fun TypeSpec.Builder.addSuperClass(resourceType: ResourceType): TypeSpec.Builder {
+    return when (resourceType) {
+        ResourceType.RESOURCE -> {
+            this.superclass(TFResource::class)
+        }
+        ResourceType.DATA -> {
+            this.superclass(TFData::class)
+        }
+        else -> {
+            throw IllegalStateException("Unsupported resource type")
+        }
+    }
+}
+
+fun TypeSpec.Builder.addClassKDoc(resourceName: String): TypeSpec.Builder {
+    return this.addKdoc("""Terraform $resourceName resource.
+            | 
+            | @see <a href="https://www.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+        """.trimMargin())
+}
+
+fun TypeSpec.Builder.addClosureFunction(resourceName: String, className: String): TypeSpec.Builder {
+    return this.addFunction(
+        FunSpec.builder(resourceName)
+            .addParameter("id", String::class)
+            .addParameter(
+                "configure", LambdaTypeName.get(
+                returnType = UNIT,
+                receiver = TypeVariableName(className)
+            )
+            )
+            .addStatement("%N(id).apply(configure)", className)
+            .build()
+    )
 }
 
 enum class ResourceType {
