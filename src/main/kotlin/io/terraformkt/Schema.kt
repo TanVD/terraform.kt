@@ -6,7 +6,6 @@ data class Schema (
 )
 
 data class ProviderSchemas(val aws: AWS)
-data class AWS(val resource_schemas: ResourceSchemas)
-data class ResourceSchemas(val aws_lambda_function: AWSLambdaFunction);
-data class AWSLambdaFunction(val version: Int, val block: AWSLambdaFunctionBlock)
-data class AWSLambdaFunctionBlock(val attributes : Map<String, Map<String, Any>>)
+data class AWS(val resource_schemas: Map<String, Resource>, val data_source_schemas : Map<String, Resource>)
+data class Resource(val version: Int, val block: ResourceBlock)
+data class ResourceBlock(val attributes : Map<String, Map<String, Any>>)
