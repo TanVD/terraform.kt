@@ -8,6 +8,7 @@ import io.terraformkt.utils.Text.snakeToCamelCase
 import java.io.File
 
 const val baseDirectoryName = "generated"
+const val packagePrefix = "io.terraformkt.aws"
 const val resourcesDirectoryName = "resource_schemas"
 const val dataDirectoryName = "data_source_schemas"
 const val provider = "aws"
@@ -17,33 +18,36 @@ fun main() {
     val schema = Json.parse<Schema>(jsonString)
     val generatedDirectory = File(baseDirectoryName)
     if (!generatedDirectory.exists()) {
-        generatedDirectory.mkdir()
+        generatedDirectory.mkdirs()
     }
 
     val resources = schema.provider_schemas.aws.resource_schemas
     val data = schema.provider_schemas.aws.data_source_schemas
-    generateFiles(resourcesDirectoryName, resources, ResourceType.RESOURCE)
-    generateFiles(dataDirectoryName, data, ResourceType.DATA)
+    generateFiles(resources, ResourceType.RESOURCE)
+    generateFiles(data, ResourceType.DATA)
+//    val lambda = lambda_function("name") {
+//        function_name = "function name"
+//        handler = "handler"
+//    }
 }
 
-fun generateFiles(path: String, resources: Map<String, Resource>, resourceType: ResourceType) {
-    val directory = File("$baseDirectoryName/$path")
-    if (!directory.exists()) {
-        directory.mkdir()
-    }
+fun generateFiles(resources: Map<String, Resource>, resourceType: ResourceType) {
     for (resourceName in resources.keys) {
-        val className = snakeToCamelCase(resourceName)
+        val className = snakeToCamelCase(removeProviderPrefix(resourceName))
 
+        val fileBuilder = FileSpec.builder("$packagePrefix.${getDirectoryName(resourceType)}", className)
         val resourceClassBuilder = TypeSpec.classBuilder(className).primaryConstructor(
-            FunSpec.constructorBuilder()
-                .addParameter("id", String::class).build()
-        ).addClassKDoc(resourceName)
-
-        resourceClassBuilder
+            FunSpec.constructorBuilder().addParameter("id", String::class).build()
+        )
+            .addClassKDoc(resourceName)
             .addSuperClass(resourceType)
             .addSuperclassConstructorParameter("id").addSuperclassConstructorParameter("\"$resourceName\"")
 
         for ((attrName, attr) in resources[resourceName]!!.block.attributes) {
+            // TODO(anstkras): find a workaround.
+            if (attrName == "owner") {
+                continue
+            }
             if (attr.containsKey("type") && attr["type"] is String) {
                 val type = attr["type"] as String
                 var isComputed = false
@@ -52,7 +56,7 @@ fun generateFiles(path: String, resources: Map<String, Resource>, resourceType: 
                 }
 
                 val propertyBuilder = PropertySpec.builder(attrName, typeToKotlinType(type))
-                    .delegate(typeToDelegate(type, isComputed))
+                    .delegate(typeToDelegate(type, isComputed)).mutable(!isComputed)
                 if (attr.containsKey("description")) {
                     propertyBuilder.addKdoc(attr["description"] as String)
                 }
@@ -60,8 +64,8 @@ fun generateFiles(path: String, resources: Map<String, Resource>, resourceType: 
                 resourceClassBuilder.addProperty(propertyBuilder.build())
             }
         }
-        resourceClassBuilder.addClosureFunction(resourceName, className)
-        File("$baseDirectoryName/$path/$className.kt").writeText(resourceClassBuilder.build().toString(), Charsets.UTF_8)
+        fileBuilder.addClosureFunction(removeProviderPrefix(resourceName), className)
+        fileBuilder.addType(resourceClassBuilder.build()).build().writeTo(File("$baseDirectoryName/"))
     }
 }
 
@@ -98,9 +102,6 @@ fun TypeSpec.Builder.addSuperClass(resourceType: ResourceType): TypeSpec.Builder
         ResourceType.DATA -> {
             this.superclass(TFData::class)
         }
-        else -> {
-            throw IllegalStateException("Unsupported resource type")
-        }
     }
 }
 
@@ -111,19 +112,27 @@ fun TypeSpec.Builder.addClassKDoc(resourceName: String): TypeSpec.Builder {
         """.trimMargin())
 }
 
-fun TypeSpec.Builder.addClosureFunction(resourceName: String, className: String): TypeSpec.Builder {
+fun FileSpec.Builder.addClosureFunction(functionName: String, className: String): FileSpec.Builder {
     return this.addFunction(
-        FunSpec.builder(resourceName)
+        FunSpec.builder(functionName)
             .addParameter("id", String::class)
             .addParameter(
                 "configure", LambdaTypeName.get(
-                returnType = UNIT,
-                receiver = TypeVariableName(className)
+                    returnType = UNIT,
+                    receiver = TypeVariableName(className)
+                )
             )
-            )
-            .addStatement("%N(id).apply(configure)", className)
+            .addStatement("return %N(id).apply(configure)", className)
+            .returns(TypeVariableName(className))
             .build()
     )
+}
+
+fun getDirectoryName(resourceType: ResourceType): String {
+    return when (resourceType) {
+        ResourceType.RESOURCE -> resourcesDirectoryName
+        ResourceType.DATA -> dataDirectoryName
+    }
 }
 
 enum class ResourceType {

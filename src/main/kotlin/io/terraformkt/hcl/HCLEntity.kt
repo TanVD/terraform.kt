@@ -13,12 +13,12 @@ import kotlin.reflect.jvm.isAccessible
  */
 open class HCLEntity(
     val fields: LinkedHashSet<HCLField<*>> = LinkedHashSet(),
-    val computed: LinkedHashSet<HCLEntity> = LinkedHashSet(),
+    val inner: LinkedHashSet<HCLEntity> = LinkedHashSet(),
     open val owner: HCLNamed? = null
 ) : HCLRender {
     override val renderable: Boolean = true
 
-    override fun render(): String = (fields.filter { it.renderable } + computed).joinToString(separator = "\n") {
+    override fun render(): String = (fields.filter { it.renderable } + inner).joinToString(separator = "\n") {
         it.render()
     }
 
@@ -36,10 +36,10 @@ open class HCLEntity(
         }
     }
 
-    inner class FieldProvider<T : Any, F : HCLField<T>>(val name: String?, val inner: Boolean, private val default: T?,
+    inner class FieldProvider<T : Any, F : HCLField<T>>(val name: String?, val computed: Boolean, private val default: T?,
                                                         val getField: (name: String, renderable: Boolean, entity: HCLEntity, value: T?) -> F) {
         operator fun provideDelegate(entity: HCLEntity, property: KProperty<*>): FieldDelegate<T, F> {
-            val field = getField(name ?: property.name, inner, entity, default)
+            val field = getField(name ?: property.name, computed, entity, default)
             entity.fields.add(field)
             return FieldDelegate(field)
         }
@@ -57,48 +57,48 @@ open class HCLEntity(
         }
     }
 
-    fun <T : HCLEntity> entity(name: String? = null, inner: Boolean = false, default: T? = null): FieldProvider<T, HCLEntityField<T>> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun <T : HCLEntity> entity(name: String? = null, computed: Boolean = false, default: T? = null): FieldProvider<T, HCLEntityField<T>> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLEntityField(field, renderable, entity, value)
         }
     }
 
     fun <T : Inner> inner(entity: T) {
-        computed.add(entity)
+        inner.add(entity)
     }
 
-    fun int(name: String? = null, inner: Boolean = false, default: Int? = null): FieldProvider<Int, HCLIntField> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun int(name: String? = null, computed: Boolean = false, default: Int? = null): FieldProvider<Int, HCLIntField> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLIntField(field, renderable, entity, value)
         }
     }
 
-    fun intArray(name: String? = null, inner: Boolean = false, default: Array<Int>? = null): FieldProvider<Array<Int>, HCLIntArrayField> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun intArray(name: String? = null, computed: Boolean = false, default: Array<Int>? = null): FieldProvider<Array<Int>, HCLIntArrayField> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLIntArrayField(field, renderable, entity, value)
         }
     }
 
-    fun bool(name: String? = null, inner: Boolean = false, default: Boolean? = null): FieldProvider<Boolean, HCLBoolField> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun bool(name: String? = null, computed: Boolean = false, default: Boolean? = null): FieldProvider<Boolean, HCLBoolField> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLBoolField(field, renderable, entity, value)
         }
     }
 
-    fun boolArray(name: String? = null, inner: Boolean = false, default: Array<Boolean>? = null): FieldProvider<Array<Boolean>, HCLBoolArrayField> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun boolArray(name: String? = null, computed: Boolean = false, default: Array<Boolean>? = null): FieldProvider<Array<Boolean>, HCLBoolArrayField> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLBoolArrayField(field, renderable, entity, value)
         }
     }
 
-    fun text(name: String? = null, inner: Boolean = false, default: String? = null): FieldProvider<String, HCLTextField> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun text(name: String? = null, computed: Boolean = false, default: String? = null): FieldProvider<String, HCLTextField> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLTextField(field, renderable, entity, value)
         }
     }
 
-    fun textArray(name: String? = null, inner: Boolean = false, default: Array<String>? = null): FieldProvider<Array<String>, HCLTextArrayField> {
-        return FieldProvider(name, inner, default) { field, renderable, entity, value ->
+    fun textArray(name: String? = null, computed: Boolean = false, default: Array<String>? = null): FieldProvider<Array<String>, HCLTextArrayField> {
+        return FieldProvider(name, computed, default) { field, renderable, entity, value ->
             HCLTextArrayField(field, renderable, entity, value)
         }
     }
