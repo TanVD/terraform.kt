@@ -2,6 +2,7 @@ package io.terraformkt
 
 import com.squareup.kotlinpoet.*
 import io.terraformkt.terraform.TFData
+import io.terraformkt.terraform.TFFile
 import io.terraformkt.terraform.TFResource
 import io.terraformkt.utils.Json
 import io.terraformkt.utils.Text.snakeToCamelCase
@@ -62,7 +63,7 @@ fun generateFiles(resources: Map<String, Resource>, resourceType: ResourceType) 
         }
         fileBuilder
             .addType(resourceClassBuilder.build())
-            .addClosureFunction(removeProviderPrefix(resourceName), className)
+            .addClosureFunctions(removeProviderPrefix(resourceName), className)
             .build().writeTo(File("$baseDirectoryName/"))
     }
 }
@@ -110,20 +111,26 @@ fun TypeSpec.Builder.addClassKDoc(resourceName: String): TypeSpec.Builder {
         """.trimMargin())
 }
 
-fun FileSpec.Builder.addClosureFunction(functionName: String, className: String): FileSpec.Builder {
+fun FileSpec.Builder.addClosureFunctions(functionName: String, className: String): FileSpec.Builder {
     return this.addFunction(
         FunSpec.builder(functionName)
             .addParameter("id", String::class)
             .addParameter(
                 "configure", LambdaTypeName.get(
-                    returnType = UNIT,
-                    receiver = TypeVariableName(className)
-                )
-            )
+                returnType = UNIT,
+                receiver = TypeVariableName(className)))
             .addStatement("return %N(id).apply(configure)", className)
             .returns(TypeVariableName(className))
             .build()
-    )
+    ).addFunction(FunSpec.builder(functionName)
+        .receiver(TFFile::class)
+        .addParameter("id", String::class)
+        .addParameter(
+            "configure", LambdaTypeName.get(
+            returnType = UNIT,
+            receiver = TypeVariableName(className)))
+        .addStatement("add(%N(id).apply(configure))", className)
+        .build())
 }
 
 fun getDirectoryName(resourceType: ResourceType): String {
