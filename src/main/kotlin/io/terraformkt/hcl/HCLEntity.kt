@@ -12,13 +12,13 @@ import kotlin.reflect.jvm.isAccessible
  * HCLEntity not necessarily is [HCLNamed]
  */
 open class HCLEntity(
-    val fields: LinkedHashSet<HCLField<*>> = LinkedHashSet(),
-    val inner: LinkedHashSet<HCLEntity> = LinkedHashSet(),
-    open val owner: HCLNamed? = null
+    val myFields: LinkedHashSet<HCLField<*>> = LinkedHashSet(),
+    val myInner: LinkedHashSet<HCLEntity> = LinkedHashSet(),
+    open val myOwner: HCLNamed? = null
 ) : HCLRender {
     override val renderable: Boolean = true
 
-    override fun render(): String = (fields.filter { it.renderable } + inner).joinToString(separator = "\n") {
+    override fun render(): String = (myFields.filter { it.renderable } + myInner).joinToString(separator = "\n") {
         it.render()
     }
 
@@ -40,7 +40,7 @@ open class HCLEntity(
                                                         val getField: (name: String, renderable: Boolean, entity: HCLEntity, value: T?) -> F) {
         operator fun provideDelegate(entity: HCLEntity, property: KProperty<*>): FieldDelegate<T, F> {
             val field = getField(name ?: property.name, computed, entity, default)
-            entity.fields.add(field)
+            entity.myFields.add(field)
             return FieldDelegate(field)
         }
     }
@@ -64,7 +64,7 @@ open class HCLEntity(
     }
 
     fun <T : Inner> inner(entity: T) {
-        inner.add(entity)
+        myInner.add(entity)
     }
 
     fun int(name: String? = null, computed: Boolean = false, default: Int? = null): FieldProvider<Int, HCLIntField> {

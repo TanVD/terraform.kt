@@ -44,10 +44,6 @@ fun generateFiles(resources: Map<String, Resource>, resourceType: ResourceType) 
             .addSuperclassConstructorParameter("id").addSuperclassConstructorParameter("\"$resourceName\"")
 
         for ((attrName, attr) in resources[resourceName]!!.block.attributes) {
-            // TODO(anstkras): find a workaround.
-            if (attrName == "owner") {
-                continue
-            }
             if (attr.containsKey("type") && attr["type"] is String) {
                 val type = attr["type"] as String
                 var isComputed = false
@@ -64,8 +60,10 @@ fun generateFiles(resources: Map<String, Resource>, resourceType: ResourceType) 
                 resourceClassBuilder.addProperty(propertyBuilder.build())
             }
         }
-        fileBuilder.addClosureFunction(removeProviderPrefix(resourceName), className)
-        fileBuilder.addType(resourceClassBuilder.build()).build().writeTo(File("$baseDirectoryName/"))
+        fileBuilder
+            .addType(resourceClassBuilder.build())
+            .addClosureFunction(removeProviderPrefix(resourceName), className)
+            .build().writeTo(File("$baseDirectoryName/"))
     }
 }
 

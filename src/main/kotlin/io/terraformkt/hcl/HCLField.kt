@@ -12,7 +12,7 @@ sealed class HCLField<T : Any>(override val hcl_name: String, val inner: Boolean
     override val renderable: Boolean
         get() = !inner && value != null
 
-    override val hcl_ref: String by lazy { link(entity.owner?.hcl_ref, hcl_name) }
+    override val hcl_ref: String by lazy { link(entity.myOwner?.hcl_ref, hcl_name) }
 }
 
 /** Field with entity owned by HCL entity */

@@ -10,7 +10,7 @@ open class TFResource(val tf_id: String, val tf_type: String) : HCLEntity.Named(
     override val hcl_ref: String
         get() = hcl_name
 
-    override val owner: HCLNamed?
+    override val myOwner: HCLNamed?
         get() = this
 
     var provider by text()
