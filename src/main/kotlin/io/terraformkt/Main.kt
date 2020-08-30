@@ -22,6 +22,12 @@ fun main() {
         generatedDirectory.mkdirs()
     }
 
+    println(File("$baseDirectoryName/io").mkdir())
+    println(File("$baseDirectoryName/io/terraformkt").mkdir())
+    println(File("$baseDirectoryName/io/terraformkt/aws").mkdir())
+    println(File("$baseDirectoryName/io/terraformkt/aws/$resourcesDirectoryName").mkdir())
+    println(File("$baseDirectoryName/io/terraformkt/aws/$dataDirectoryName").mkdirs())
+
     val resources = schema.provider_schemas.aws.resource_schemas
     val data = schema.provider_schemas.aws.data_source_schemas
     generateFiles(resources, ResourceType.RESOURCE)
@@ -61,6 +67,9 @@ fun generateFiles(resources: Map<String, Resource>, resourceType: ResourceType) 
                 resourceClassBuilder.addProperty(propertyBuilder.build())
             }
         }
+        val file = File("$baseDirectoryName/io/terraformkt/aws/${getDirectoryName(resourceType)}/$className.kt")
+        file.createNewFile()
+
         fileBuilder
             .addType(resourceClassBuilder.build())
             .addClosureFunctions(removeProviderPrefix(resourceName), className)
