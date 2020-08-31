@@ -73,9 +73,9 @@ open class HCLEntity(
         }
     }
 
-    fun intArray(name: String? = null, computed: Boolean = false, default: Array<Int>? = null): FieldProvider<Array<Int>, HCLIntArrayField> {
+    fun intList(name: String? = null, computed: Boolean = false, default: Array<Int>? = null): FieldProvider<Array<Int>, HCLIntListField> {
         return FieldProvider(name, computed, default) { field, renderable, entity, value ->
-            HCLIntArrayField(field, renderable, entity, value)
+            HCLIntListField(field, renderable, entity, value)
         }
     }
 
@@ -85,9 +85,9 @@ open class HCLEntity(
         }
     }
 
-    fun boolArray(name: String? = null, computed: Boolean = false, default: Array<Boolean>? = null): FieldProvider<Array<Boolean>, HCLBoolArrayField> {
+    fun boolList(name: String? = null, computed: Boolean = false, default: Array<Boolean>? = null): FieldProvider<Array<Boolean>, HCLBoolListField> {
         return FieldProvider(name, computed, default) { field, renderable, entity, value ->
-            HCLBoolArrayField(field, renderable, entity, value)
+            HCLBoolListField(field, renderable, entity, value)
         }
     }
 
@@ -97,9 +97,9 @@ open class HCLEntity(
         }
     }
 
-    fun textArray(name: String? = null, computed: Boolean = false, default: Array<String>? = null): FieldProvider<Array<String>, HCLTextArrayField> {
+    fun textList(name: String? = null, computed: Boolean = false, default: Array<String>? = null): FieldProvider<Array<String>, HCLTextListField> {
         return FieldProvider(name, computed, default) { field, renderable, entity, value ->
-            HCLTextArrayField(field, renderable, entity, value)
+            HCLTextListField(field, renderable, entity, value)
         }
     }
 }

@@ -15,7 +15,7 @@ open class TFResource(val tf_id: String, val tf_type: String) : HCLEntity.Named(
 
     var provider by text()
 
-    var depends_on by textArray()
+    var depends_on by textList()
 
     class Lifecycle : HCLEntity.Inner("lifecycle") {
         var create_before_destroy by bool(default = true)

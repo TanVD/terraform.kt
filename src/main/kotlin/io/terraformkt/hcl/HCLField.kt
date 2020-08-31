@@ -37,8 +37,8 @@ class HCLTextField(name: String, inner: Boolean, owner: HCLEntity, value: String
     }
 }
 
-/** Field with text array owned by HCL entity */
-class HCLTextArrayField(name: String, inner: Boolean, owner: HCLEntity, value: Array<String>?) : HCLField<Array<String>>(name, inner, owner, value) {
+/** Field with text list owned by HCL entity */
+class HCLTextListField(name: String, inner: Boolean, owner: HCLEntity, value: Array<String>?) : HCLField<Array<String>>(name, inner, owner, value) {
     override fun render(): String {
         return "$hcl_name = ${value!!.sortedArray().joinToString(prefix = "[", postfix = "]") { HCLTextField.toText(it) } }"
     }
@@ -51,8 +51,8 @@ class HCLBoolField(name: String, inner: Boolean, owner: HCLEntity, value: Boolea
     }
 }
 
-/** Field with bool array owned by HCL entity */
-class HCLBoolArrayField(name: String, inner: Boolean, owner: HCLEntity, value: Array<Boolean>?) : HCLField<Array<Boolean>>(name, inner, owner, value) {
+/** Field with bool list owned by HCL entity */
+class HCLBoolListField(name: String, inner: Boolean, owner: HCLEntity, value: Array<Boolean>?) : HCLField<Array<Boolean>>(name, inner, owner, value) {
     override fun render(): String {
         return "$hcl_name = ${value!!.sortedArray().joinToString(prefix = "[", postfix = "]") { "$it" }}"
     }
@@ -65,8 +65,8 @@ class HCLIntField(name: String, inner: Boolean, owner: HCLEntity, value: Int?) :
     }
 }
 
-/** Field with int array owned by HCL entity */
-class HCLIntArrayField(name: String, inner: Boolean, owner: HCLEntity, value: Array<Int>?) : HCLField<Array<Int>>(name, inner, owner, value) {
+/** Field with int list owned by HCL entity */
+class HCLIntListField(name: String, inner: Boolean, owner: HCLEntity, value: Array<Int>?) : HCLField<Array<Int>>(name, inner, owner, value) {
     override fun render(): String {
         return "$hcl_name = ${value!!.sortedArray().joinToString(prefix = "[", postfix = "]") { "$it" }}"
     }
