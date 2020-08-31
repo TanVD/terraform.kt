@@ -1,6 +1,6 @@
 package io.terraformkt.plugin
 
-import io.terraformkt.main
+import io.terraformkt.TerraformGenerator
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
@@ -23,7 +23,7 @@ open class GenerateTerraform : DefaultTask() {
     @TaskAction
     fun act() {
         try {
-            main()
+            TerraformGenerator(terraformKt.jsonSchemaFile!!, terraformKt.generationPath!!).generate()
         } catch (e: Exception) {
             e.printStackTrace()
         }

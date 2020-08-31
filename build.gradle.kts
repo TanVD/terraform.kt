@@ -1,3 +1,5 @@
+import io.terraformkt.plugin.terraformKt
+
 group = "io.terraformkt"
 version = "0.1.0"
 
@@ -14,7 +16,7 @@ plugins {
     id("tanvd.kosogor") version "1.0.9" apply true
     kotlin("jvm") version "1.3.72" apply true
 
-    `java-gradle-plugin`
+    id("java-gradle-plugin")
     id("maven")
 }
 
@@ -52,7 +54,7 @@ apply {
     plugin("io.terraformkt.gradle.plugin")
 }
 
-//terraformKt {
-//    jsonSchemaFile = File("resources/schema.json")
-//    generationPath = File("generated")
-//}
+terraformKt {
+    jsonSchemaFile = File("src/main/resources/schema.json")
+    generationPath = File("generated")
+}
