@@ -2,6 +2,7 @@ package io.terraformkt
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.terraform.TFData
 import io.terraformkt.terraform.TFFile
 import io.terraformkt.terraform.TFResource
@@ -10,10 +11,12 @@ import io.terraformkt.utils.Text.snakeToCamelCase
 import java.io.File
 
 class TerraformGenerator(private val pathToSchema: File, private val generationPath: File) {
-    private val packagePrefix = "io.terraformkt.aws"
-    private val resourcesDirectoryName = "resource_schemas"
-    private val dataDirectoryName = "data_source_schemas"
-    private val provider = "aws"
+    companion object {
+        private const val PACKAGE_PREFIX = "io.terraformkt.aws"
+        private const val RESOURCES_DIRECTORY_NAME = "resource_schemas"
+        private const val DATA_DIRECTORY_NAME = "data_source_schemas"
+        private const val PROVIDER = "aws"
+    }
 
     fun generate() {
         val jsonString = pathToSchema.readText()
@@ -25,8 +28,8 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         println(generationPath.resolve("io").mkdir())
         println(generationPath.resolve("io/terraformkt").mkdir())
         println(generationPath.resolve("io/terraformkt/aws").mkdir())
-        println(generationPath.resolve("io/terraformkt/aws/$resourcesDirectoryName").mkdir())
-        println(generationPath.resolve("io/terraformkt/aws/$dataDirectoryName").mkdir())
+        println(generationPath.resolve("io/terraformkt/aws/$RESOURCES_DIRECTORY_NAME").mkdir())
+        println(generationPath.resolve("io/terraformkt/aws/$DATA_DIRECTORY_NAME").mkdir())
 
         val resources = schema.provider_schemas.aws.resource_schemas
         val data = schema.provider_schemas.aws.data_source_schemas
@@ -39,7 +42,7 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         for (resourceName in resources.keys) {
             val className = snakeToCamelCase(removeProviderPrefix(resourceName))
 
-            val fileBuilder = FileSpec.builder("$packagePrefix.${getDirectoryName(resourceType)}", className)
+            val fileBuilder = FileSpec.builder("${Companion.PACKAGE_PREFIX}.${getDirectoryName(resourceType)}", className)
             val resourceClassBuilder = TypeSpec.classBuilder(className)
                 .primaryConstructor(
                     FunSpec.constructorBuilder()
@@ -58,13 +61,10 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
                 if (type == Type.ANY) {
                     continue
                 }
-                var isComputed = false
-                if (attr.containsKey("computed")) {
-                    isComputed = attr["computed"] as Boolean
-                }
+                val isComputed = attr["computed"] as? Boolean ?: false
 
                 val propertyBuilder = PropertySpec
-                    .builder(attrName, typeToKotlinType(type))
+                    .builder(attrName, type.typeName)
                     .delegate(typeToDelegate(type, isComputed))
                     .mutable(!isComputed)
                 if (attr.containsKey("description")) {
@@ -114,30 +114,7 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
     }
 
     private fun typeToDelegate(type: Type, isComputed: Boolean): String {
-        var delegateName = when (type) {
-            Type.STRING -> "text"
-            Type.NUMBER -> "int"
-            Type.BOOL -> "bool"
-            Type.STRING_LIST -> "textList"
-            Type.NUMBER_LIST -> "intList"
-            Type.BOOL_LIST -> "boolList"
-            else -> ""
-        }
-        delegateName += if (isComputed) "(computed = true)" else "()"
-
-        return delegateName
-    }
-
-    private fun typeToKotlinType(type: Type): TypeName {
-        return when (type) {
-            Type.STRING -> STRING
-            Type.NUMBER -> INT
-            Type.BOOL -> BOOLEAN
-            Type.STRING_LIST ->  Array<String>::class.asClassName().parameterizedBy(STRING)
-            Type.NUMBER_LIST -> Array<Int>::class.asClassName().parameterizedBy(INT)
-            Type.BOOL_LIST -> Array<Boolean>::class.asClassName().parameterizedBy(BOOLEAN)
-            else -> ANY
-        }
+        return type.delegateName + if (isComputed) "(computed = true)" else "()"
     }
 
     private fun removeProviderPrefix(resourceName: String): String {
@@ -159,7 +136,7 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         return this.addKdoc(
             """Terraform $resourceName resource.
             | 
-            | @see <a href="https://www.io.terraformkt.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+            | @see <a href="https://www.io.terraformkt.terraform.io/docs/providers/$PROVIDER/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
         """.trimMargin()
         )
     }
@@ -187,15 +164,15 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
                         receiver = TypeVariableName(className)
                     )
                 )
-                .addStatement("add(%N(id).apply(configure))", className)
+                .addStatement("%N(%N(id).apply(configure))", TFFile::add.name ,className)
                 .build()
         )
     }
 
     private fun getDirectoryName(resourceType: ResourceType): String {
         return when (resourceType) {
-            ResourceType.RESOURCE -> resourcesDirectoryName
-            ResourceType.DATA -> dataDirectoryName
+            ResourceType.RESOURCE -> RESOURCES_DIRECTORY_NAME
+            ResourceType.DATA -> DATA_DIRECTORY_NAME
         }
     }
 
@@ -204,15 +181,15 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         RESOURCE
     }
 
-    enum class Type {
-        STRING,
-        NUMBER,
-        BOOL,
-        STRING_LIST,
-        NUMBER_LIST,
-        BOOL_LIST,
+    enum class Type(val delegateName: String, val typeName: TypeName) {
+        STRING(HCLEntity::text.name, com.squareup.kotlinpoet.STRING),
+        NUMBER(HCLEntity::int.name, INT),
+        BOOL(HCLEntity::bool.name, BOOLEAN),
+        STRING_LIST(HCLEntity::textList.name, Array<String>::class.asClassName().parameterizedBy(com.squareup.kotlinpoet.STRING)),
+        NUMBER_LIST(HCLEntity::intList.name, Array<Int>::class.asClassName().parameterizedBy(INT)),
+        BOOL_LIST(HCLEntity::boolList.name, Array<Boolean>::class.asClassName().parameterizedBy(BOOLEAN)),
 
         // TODO support map and remove any
-        ANY
+        ANY("", com.squareup.kotlinpoet.ANY)
     }
 }
