@@ -10,5 +10,4 @@ fun main() {
 //    }
 //
 //    println(lambda.function_name)
-    println(System.getProperty("user.dir"))
 }

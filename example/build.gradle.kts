@@ -1,5 +1,7 @@
 import io.terraformkt.plugin.terraformKt
 
+//import io.terraformkt.plugin.terraformKt
+
 group = rootProject.group
 version = rootProject.version
 
@@ -21,11 +23,15 @@ repositories {
     jcenter()
 }
 
+//dependencies {
+//    implementation(project(":terraformEntities"))
+//}
+
 apply {
     plugin("io.terraformkt.gradle.plugin")
 }
 
 terraformKt {
     jsonSchemaFile = File("terraformkt/src/main/resources/schema.json")
-    generationPath = File("generated")
+    generationPath = File("example/generated")
 }

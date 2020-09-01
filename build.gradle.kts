@@ -6,7 +6,7 @@ version = "0.1.0"
 //        mavenLocal()
 //    }
 //    dependencies {
-//        classpath("io.terraformkt:terraform.kt:0.1.0")
+//        classpath("io.terraformkt:io.terraformkt.terraform.kt:0.1.0")
 //    }
 //}
 

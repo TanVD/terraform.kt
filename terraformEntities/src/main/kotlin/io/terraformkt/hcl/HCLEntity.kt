@@ -37,7 +37,7 @@ open class HCLEntity(
     }
 
     inner class FieldProvider<T : Any, F : HCLField<T>>(val name: String?, val computed: Boolean, private val default: T?,
-                                                        val getField: (name: String, renderable: Boolean, entity: HCLEntity, value: T?) -> F) {
+                                                                               val getField: (name: String, renderable: Boolean, entity: HCLEntity, value: T?) -> F) {
         operator fun provideDelegate(entity: HCLEntity, property: KProperty<*>): FieldDelegate<T, F> {
             val field = getField(name ?: property.name, computed, entity, default)
             entity.myFields.add(field)
