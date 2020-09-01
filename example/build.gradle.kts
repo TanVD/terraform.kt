@@ -6,9 +6,14 @@ version = rootProject.version
 buildscript {
     repositories {
         mavenLocal()
+
+        // Can't find terraformEntities without it.
+        flatDir {
+            dirs("../build/terraformEntities/libs")
+        }
     }
     dependencies {
-        classpath("io.terraformkt:terraform.kt:0.1.0")
+        classpath("io.terraformkt:terraformkt:0.1.0")
     }
 }
 
@@ -30,7 +35,6 @@ apply {
 }
 
 terraformKt {
-    jsonSchemaFile = File("terraformkt/src/main/resources/schema.json")
-    generationPath = File("example/generated")
-    //sourcePath = File("generated")
+    jsonSchemaFile = File("src/main/resources/schema.json")
+    generationPath = File("generated")
 }

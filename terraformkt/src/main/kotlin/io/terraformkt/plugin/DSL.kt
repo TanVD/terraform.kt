@@ -3,17 +3,16 @@ package io.terraformkt.plugin
 import java.io.File
 
 @DslMarker
-annotation class RuntimeDSLTag
+annotation class TerraformKtDSLTag
 
 open class TerraformKtPluginExtension {
     var jsonSchemaFile: File? = null
     var generationPath: File? = null
-    var sourcePath: File? = null
 }
 
 var terraformKt = TerraformKtPluginExtension()
 
-@RuntimeDSLTag
+@TerraformKtDSLTag
 fun terraformKt(configure: TerraformKtPluginExtension.() -> Unit) {
     terraformKt.configure()
 }

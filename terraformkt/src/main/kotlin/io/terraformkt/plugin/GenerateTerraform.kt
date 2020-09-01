@@ -22,11 +22,10 @@ open class GenerateTerraform : DefaultTask() {
 
     @TaskAction
     fun act() {
-        throw IllegalAccessError();
-//        try {
-//            TerraformGenerator(terraformKt.jsonSchemaFile!!, terraformKt.generationPath!!).generate()
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
+        try {
+            TerraformGenerator(terraformKt.jsonSchemaFile!!, terraformKt.generationPath!!).generate()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
