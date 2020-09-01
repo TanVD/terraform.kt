@@ -8,6 +8,7 @@ annotation class RuntimeDSLTag
 open class TerraformKtPluginExtension {
     var jsonSchemaFile: File? = null
     var generationPath: File? = null
+    var sourcePath: File? = null
 }
 
 var terraformKt = TerraformKtPluginExtension()

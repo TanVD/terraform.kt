@@ -2,7 +2,7 @@ package io.terraformkt.plugin
 
 import io.terraformkt.TerraformGenerator
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -12,7 +12,7 @@ open class GenerateTerraform : DefaultTask() {
         group = "terraformkt"
     }
 
-    @get:Input
+    @get:InputFile
     val jsonSchemaFile: File?
         get() = terraformKt.jsonSchemaFile
 
@@ -22,10 +22,11 @@ open class GenerateTerraform : DefaultTask() {
 
     @TaskAction
     fun act() {
-        try {
-            TerraformGenerator(terraformKt.jsonSchemaFile!!, terraformKt.generationPath!!).generate()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        throw IllegalAccessError();
+//        try {
+//            TerraformGenerator(terraformKt.jsonSchemaFile!!, terraformKt.generationPath!!).generate()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 }

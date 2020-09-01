@@ -8,10 +8,11 @@ class TerraformKtPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.afterEvaluate {
             target.mySourceSets.apply {
-                this["main"].java.srcDir(terraformKt.generationPath!!)
+                this["main"].java.srcDir(terraformKt.sourcePath!!)
             }
         }
 
+        println(1)
         val generateTerraform = target.tasks.create("generateTerraform", GenerateTerraform::class.java)
     }
 }

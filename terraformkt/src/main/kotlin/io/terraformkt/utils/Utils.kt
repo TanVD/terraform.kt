@@ -10,5 +10,5 @@ fun unlink(field: String): String {
 
 fun isLink(field: String) = field.startsWith("\${") && field.endsWith("}")
 
-fun link(field: String) = "\${$field}"
-fun link(vararg parts: String?) = link(parts.filterNotNull().joinToString(separator = "."))
+//fun link(field: String) = "\${$field}"
+//fun link(vararg parts: String?) = link(parts.filterNotNull().joinToString(separator = "."))
