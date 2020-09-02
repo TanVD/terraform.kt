@@ -37,4 +37,6 @@ apply {
 terraformKt {
     jsonSchemaFile = File("src/main/resources/schema.json")
     generationPath = File("generated")
+    tfVersion = "0.13.0"
+    tfPath = File("tf/terraform")
 }
