@@ -19,7 +19,7 @@ class PackageNameProvider(private val provider: String) {
     }
 
     fun getPackageName(resourceType: TerraformGenerator.ResourceType, className: String): String {
-        return "$PACKAGE_PREFIX.${getDirectoryName(resourceType)}.${getClassPackageName(className)}"
+        return "$PACKAGE_PREFIX.$provider.${getDirectoryName(resourceType)}.${getClassPackageName(className)}"
     }
 
     private fun getMappings(): Map<String, String>? {
