@@ -8,6 +8,7 @@ import io.terraformkt.terraform.TFFile
 import io.terraformkt.terraform.TFResource
 import io.terraformkt.utils.Json
 import io.terraformkt.utils.Text.snakeToCamelCase
+import io.terraformkt.utils.myMkdirs
 import java.io.File
 
 class TerraformGenerator(private val pathToSchema: File, private val generationPath: File) {
@@ -21,15 +22,6 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
     fun generate() {
         val jsonString = pathToSchema.readText()
         val schema = Json.parse<Schema>(jsonString)
-        if (!generationPath.exists()) {
-            generationPath.mkdirs()
-        }
-
-        println(generationPath.resolve("io").mkdir())
-        println(generationPath.resolve("io/terraformkt").mkdir())
-        println(generationPath.resolve("io/terraformkt/aws").mkdir())
-        println(generationPath.resolve("io/terraformkt/aws/$RESOURCES_DIRECTORY_NAME").mkdir())
-        println(generationPath.resolve("io/terraformkt/aws/$DATA_DIRECTORY_NAME").mkdir())
 
         val resources = schema.provider_schemas.aws.resource_schemas
         val data = schema.provider_schemas.aws.data_source_schemas
@@ -76,6 +68,7 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
 
 
             val file = generationPath.resolve("io/terraformkt/aws/${getDirectoryName(resourceType)}/$className.kt")
+            file.parentFile.myMkdirs()
             file.createNewFile()
 
             fileBuilder
