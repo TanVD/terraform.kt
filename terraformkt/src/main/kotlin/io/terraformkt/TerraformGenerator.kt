@@ -13,10 +13,8 @@ import java.io.File
 
 class TerraformGenerator(private val pathToSchema: File, private val generationPath: File) {
     companion object {
-        private const val PACKAGE_PREFIX = "io.terraformkt.aws"
-        private const val RESOURCES_DIRECTORY_NAME = "resource_schemas"
-        private const val DATA_DIRECTORY_NAME = "data_source_schemas"
         private const val PROVIDER = "aws"
+        private val packageNameProvider = PackageNameProvider(PROVIDER)
     }
 
     fun generate() {
@@ -34,7 +32,7 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         for (resourceName in resources.keys) {
             val className = snakeToCamelCase(removeProviderPrefix(resourceName))
 
-            val fileBuilder = FileSpec.builder("${Companion.PACKAGE_PREFIX}.${getDirectoryName(resourceType)}", className)
+            val fileBuilder = FileSpec.builder(packageNameProvider.getPackageName(resourceType, className), className)
             val resourceClassBuilder = TypeSpec.classBuilder(className)
                 .primaryConstructor(
                     FunSpec.constructorBuilder()
@@ -67,15 +65,14 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
             }
 
 
-            val file = generationPath.resolve("io/terraformkt/aws/${getDirectoryName(resourceType)}/$className.kt")
+            val file = generationPath.resolve(packageNameProvider.getClassFilePath(resourceType, className))
             file.parentFile.myMkdirs()
             file.createNewFile()
 
             fileBuilder
                 .addType(resourceClassBuilder.build())
                 .addClosureFunctions(removeProviderPrefix(resourceName), className)
-                .build()
-                .writeTo(generationPath)
+            file.writeText(fileBuilder.build().toString())
         }
     }
 
@@ -157,16 +154,9 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
                         receiver = TypeVariableName(className)
                     )
                 )
-                .addStatement("%N(%N(id).apply(configure))", TFFile::add.name ,className)
+                .addStatement("%N(%N(id).apply(configure))", TFFile::add.name, className)
                 .build()
         )
-    }
-
-    private fun getDirectoryName(resourceType: ResourceType): String {
-        return when (resourceType) {
-            ResourceType.RESOURCE -> RESOURCES_DIRECTORY_NAME
-            ResourceType.DATA -> DATA_DIRECTORY_NAME
-        }
     }
 
     enum class ResourceType {
