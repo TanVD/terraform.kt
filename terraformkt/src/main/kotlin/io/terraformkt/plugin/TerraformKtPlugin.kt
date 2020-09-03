@@ -18,7 +18,8 @@ class TerraformKtPlugin : Plugin<Project> {
             }
         }
 
-        val generateTerraform = target.tasks.create("generateTerraform", GenerateTerraform::class.java)
+        target.tasks.create("generateTerraform", GenerateTerraformTask::class.java)
         target.tasks.create("downloadTerraform", DownloadTerraformTask::class.java)
+        target.tasks.create("downloadSchema", DownloadSchemaTask::class.java)
     }
 }

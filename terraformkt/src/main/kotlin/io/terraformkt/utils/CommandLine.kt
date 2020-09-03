@@ -3,6 +3,7 @@ package io.terraformkt.utils
 import org.codehaus.plexus.util.Os
 import org.codehaus.plexus.util.cli.*
 import java.io.File
+import java.io.FileWriter
 
 internal object CommandLine {
     val os by lazy {
@@ -24,8 +25,25 @@ internal object CommandLine {
         )
     }
 
+    fun executeToFile(exec: String, args: List<String>, workingDir: File, stdoutFile: File, redirectErr: Boolean = true): Int {
+        return CommandLineUtils.executeCommandLine(
+            Commandline().apply {
+                workingDirectory = workingDir
+                executable = exec
+                addArguments(args.toTypedArray())
+            }, WriterStreamConsumer(FileWriter(stdoutFile)), getConsumer(redirectErr)
+        )
+    }
+
     fun executeOrFail(exec: String, args: List<String>, workingDir: File, redirectStdout: Boolean = false, redirectErr: Boolean = true){
         val returnCode = execute(exec, args, workingDir, redirectStdout, redirectErr)
+        if (returnCode != 0) {
+            error("Command failed: '$exec ${args.joinToString { " " }}'")
+        }
+    }
+
+    fun executeOrFailToFile(exec: String, args: List<String>, workingDir: File, stdoutFile: File, redirectErr: Boolean = true){
+        val returnCode = executeToFile(exec, args, workingDir, stdoutFile, redirectErr)
         if (returnCode != 0) {
             error("Command failed: '$exec ${args.joinToString { " " }}'")
         }

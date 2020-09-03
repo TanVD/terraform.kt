@@ -7,7 +7,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-open class GenerateTerraform : DefaultTask() {
+open class GenerateTerraformTask : DefaultTask() {
     init {
         group = "terraformkt"
     }

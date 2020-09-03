@@ -21,8 +21,8 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         val jsonString = pathToSchema.readText()
         val schema = Json.parse<Schema>(jsonString)
 
-        val resources = schema.provider_schemas.aws.resource_schemas
-        val data = schema.provider_schemas.aws.data_source_schemas
+        val resources = schema.provider_schemas.values.toList()[0].resource_schemas
+        val data = schema.provider_schemas.values.toList()[0].data_source_schemas
 
         generateFiles(resources, ResourceType.RESOURCE)
         generateFiles(data, ResourceType.DATA)
