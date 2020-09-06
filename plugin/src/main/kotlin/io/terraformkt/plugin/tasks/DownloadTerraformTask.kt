@@ -5,7 +5,7 @@ import io.terraformkt.utils.Archive
 import io.terraformkt.utils.CommandLine
 import io.terraformkt.utils.CommandLine.os
 import io.terraformkt.utils.Downloads
-import io.terraformkt.utils.myResolve
+import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import java.io.File
@@ -22,7 +22,7 @@ open class DownloadTerraformTask : DefaultTask() {
 
     @get:OutputFile
     val file: File?
-        get() = terraformKt.downLoadTerraformPath!!.myResolve().resolve("terraform")
+        get() = terraformKt.downLoadTerraformPath!!.normalize().resolve("terraform")
 
     @TaskAction
     fun download() {

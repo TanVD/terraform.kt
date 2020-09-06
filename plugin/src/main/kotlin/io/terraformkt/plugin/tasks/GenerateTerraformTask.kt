@@ -2,10 +2,9 @@ package io.terraformkt.plugin.tasks
 
 import io.terraformkt.TerraformGenerator
 import io.terraformkt.plugin.terraformKt
-import io.terraformkt.utils.myResolve
+import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -34,7 +33,7 @@ open class GenerateTerraformTask : DefaultTask() {
     @TaskAction
     fun act() {
         try {
-            TerraformGenerator(terraformKt.downLoadTerraformPath!!.myResolve().resolve("schema.json"), terraformKt.generationPath!!).generate()
+            TerraformGenerator(terraformKt.downLoadTerraformPath!!.normalize().resolve("schema.json"), terraformKt.generationPath!!).generate()
         } catch (e: Exception) {
             e.printStackTrace()
         }

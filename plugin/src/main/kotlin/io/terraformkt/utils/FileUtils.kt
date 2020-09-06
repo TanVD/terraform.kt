@@ -18,7 +18,7 @@ fun File.myMkdirs(): Boolean {
     if (mkdir()) {
         return true
     }
-    val resolvedFile = File(System.getProperty("user.dir")).resolve(this)
+    val resolvedFile = this.normalize()
 
     val canonFile: File = try {
         resolvedFile.canonicalFile
@@ -30,6 +30,6 @@ fun File.myMkdirs(): Boolean {
         canonFile.mkdir()
 }
 
-fun File.myResolve(): File {
+fun File.normalize(): File {
     return File(System.getProperty("user.dir")).resolve(this)
 }

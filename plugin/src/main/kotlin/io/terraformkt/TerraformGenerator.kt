@@ -7,15 +7,16 @@ import io.terraformkt.terraform.TFData
 import io.terraformkt.terraform.TFFile
 import io.terraformkt.terraform.TFResource
 import io.terraformkt.utils.Json
+import io.terraformkt.utils.NamesUtils
 import io.terraformkt.utils.Text.snakeToCamelCase
 import io.terraformkt.utils.myMkdirs
 import java.io.File
 
-class TerraformGenerator(private val pathToSchema: File, private val generationPath: File) {
-    companion object {
-        private const val PROVIDER = "aws"
-        private val packageNameProvider = PackageNameProvider(PROVIDER)
-    }
+class TerraformGenerator(
+    private val pathToSchema: File, private val generationPath: File,
+    private val provider: String
+) {
+    private val packageNameProvider = NamesUtils(provider)
 
     fun generate() {
         val jsonString = pathToSchema.readText()
@@ -126,7 +127,7 @@ class TerraformGenerator(private val pathToSchema: File, private val generationP
         return this.addKdoc(
             """Terraform $resourceName resource.
             | 
-            | @see <a href="https://www.io.terraformkt.terraform.io/docs/providers/$PROVIDER/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+            | @see <a href="https://www.io.terraformkt.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
         """.trimMargin()
         )
     }

@@ -2,7 +2,7 @@ package io.terraformkt.plugin.tasks
 
 import io.terraformkt.plugin.terraformKt
 import io.terraformkt.utils.CommandLine
-import io.terraformkt.utils.myResolve
+import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import java.io.File
@@ -14,7 +14,7 @@ open class DownloadSchemaTask : DefaultTask() {
     }
 
     @get:InputDirectory
-    var root: File = terraformKt.downLoadTerraformPath!!.myResolve()
+    var root: File = terraformKt.downLoadTerraformPath!!.normalize()
 
     @TaskAction
     fun execOperation() {
@@ -28,7 +28,7 @@ open class DownloadSchemaTask : DefaultTask() {
     }
 
     private fun createConfigFile(tfProvider: String, schemaVersion: String) {
-        val configFile = terraformKt.downLoadTerraformPath!!.myResolve().resolve("config.tf")
+        val configFile = terraformKt.downLoadTerraformPath!!.normalize().resolve("config.tf")
         configFile.createNewFile()
         configFile.writeText("""
         |provider "$tfProvider" {

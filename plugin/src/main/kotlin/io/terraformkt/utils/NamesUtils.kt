@@ -1,10 +1,9 @@
-package io.terraformkt
+package io.terraformkt.utils
 
-import io.terraformkt.utils.Json
-import io.terraformkt.utils.Text
+import io.terraformkt.TerraformGenerator
 import java.io.File
 
-class PackageNameProvider(private val provider: String) {
+class NamesUtils(private val provider: String) {
     private val mappings = getMappings()
 
     companion object {
