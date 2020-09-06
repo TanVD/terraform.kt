@@ -8,7 +8,9 @@ annotation class TerraformKtDSLTag
 open class TerraformKtPluginExtension {
     var generationPath: File? = null
     var tfVersion: String? = null
-    var tfConfig: File? = null
+    var tfProvider: String? = null
+    var downLoadTerraformPath: File? = null
+    var schemaVersion: String? = null
 }
 
 var terraformKt = TerraformKtPluginExtension()

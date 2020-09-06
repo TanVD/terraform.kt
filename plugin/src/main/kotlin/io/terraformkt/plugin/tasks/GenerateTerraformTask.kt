@@ -19,6 +19,14 @@ open class GenerateTerraformTask : DefaultTask() {
     val tfVersion: String?
         get() = terraformKt.tfVersion
 
+    @get:Input
+    val tfProvider: String?
+        get() = terraformKt.tfProvider
+
+    @get:Input
+    val schemaVersion: String?
+        get() = terraformKt.schemaVersion
+
     @get:OutputDirectory
     val generationPath: File?
         get() = terraformKt.generationPath
@@ -26,7 +34,7 @@ open class GenerateTerraformTask : DefaultTask() {
     @TaskAction
     fun act() {
         try {
-            TerraformGenerator(terraformKt.tfConfig!!.parentFile.myResolve().resolve("schema.json"), terraformKt.generationPath!!).generate()
+            TerraformGenerator(terraformKt.downLoadTerraformPath!!.myResolve().resolve("schema.json"), terraformKt.generationPath!!).generate()
         } catch (e: Exception) {
             e.printStackTrace()
         }

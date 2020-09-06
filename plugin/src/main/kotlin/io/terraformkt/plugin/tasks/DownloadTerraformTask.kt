@@ -22,7 +22,7 @@ open class DownloadTerraformTask : DefaultTask() {
 
     @get:OutputFile
     val file: File?
-        get() = terraformKt.tfConfig!!.parentFile.myResolve().resolve("terraform")
+        get() = terraformKt.downLoadTerraformPath!!.myResolve().resolve("terraform")
 
     @TaskAction
     fun download() {

@@ -14,14 +14,26 @@ open class DownloadSchemaTask : DefaultTask() {
     }
 
     @get:InputDirectory
-    var root: File = terraformKt.tfConfig!!.parentFile!!.myResolve()
+    var root: File = terraformKt.downLoadTerraformPath!!.myResolve()
 
     @TaskAction
     fun execOperation() {
         val terraformPath = root.resolve("terraform").absolutePath
+        createConfigFile(terraformKt.tfProvider ?: error("tfProvider is null"), terraformKt.schemaVersion ?: error("schemaVersion is null"))
+
         CommandLine.executeOrFail(terraformPath, listOf("init"), root, redirectStdout = true, redirectErr = true)
         CommandLine.executeOrFailToFile(terraformPath, listOf("providers", "schema", "-json"), root,
             root.resolve("schema.json"), redirectErr = true)
 
+    }
+
+    private fun createConfigFile(tfProvider: String, schemaVersion: String) {
+        val configFile = terraformKt.downLoadTerraformPath!!.myResolve().resolve("config.tf")
+        configFile.createNewFile()
+        configFile.writeText("""
+        |provider "$tfProvider" {
+        |    version = "$schemaVersion"
+        |}
+        """.trimMargin())
     }
 }
