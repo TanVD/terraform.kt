@@ -9,11 +9,11 @@ buildscript {
 
         // Can't find terraformEntities without it.
         flatDir {
-            dirs("../build/terraformEntities/libs")
+            dirs("../build/entities/libs")
         }
     }
     dependencies {
-        classpath("io.terraformkt:terraformkt:0.1.0")
+        classpath("io.terraformkt:plugin:0.1.0")
     }
 }
 
@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":terraformEntities"))
+    implementation(project(":entities"))
 }
 
 apply {
@@ -35,8 +35,7 @@ apply {
 }
 
 terraformKt {
-    jsonSchemaFile = File("tf/schema.json")
-    generationPath = File("generated")
+    generationPath = File("generated1")
     tfVersion = "0.13.0"
-    tfPath = File("tf/terraform")
+    tfConfig = File("tf/config.tf")
 }

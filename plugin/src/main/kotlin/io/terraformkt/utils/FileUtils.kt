@@ -29,3 +29,7 @@ fun File.myMkdirs(): Boolean {
     return parent != null && (parent.mkdirs() || parent.exists()) &&
         canonFile.mkdir()
 }
+
+fun File.myResolve(): File {
+    return File(System.getProperty("user.dir")).resolve(this)
+}

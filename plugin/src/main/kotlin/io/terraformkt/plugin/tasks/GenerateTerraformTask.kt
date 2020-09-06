@@ -1,7 +1,10 @@
-package io.terraformkt.plugin
+package io.terraformkt.plugin.tasks
 
 import io.terraformkt.TerraformGenerator
+import io.terraformkt.plugin.terraformKt
+import io.terraformkt.utils.myResolve
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -12,9 +15,9 @@ open class GenerateTerraformTask : DefaultTask() {
         group = "terraformkt"
     }
 
-    @get:InputFile
-    val jsonSchemaFile: File?
-        get() = terraformKt.jsonSchemaFile
+    @get:Input
+    val tfVersion: String?
+        get() = terraformKt.tfVersion
 
     @get:OutputDirectory
     val generationPath: File?
@@ -23,7 +26,7 @@ open class GenerateTerraformTask : DefaultTask() {
     @TaskAction
     fun act() {
         try {
-            TerraformGenerator(terraformKt.jsonSchemaFile!!, terraformKt.generationPath!!).generate()
+            TerraformGenerator(terraformKt.tfConfig!!.parentFile.myResolve().resolve("schema.json"), terraformKt.generationPath!!).generate()
         } catch (e: Exception) {
             e.printStackTrace()
         }

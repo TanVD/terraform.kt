@@ -17,7 +17,7 @@ dependencies {
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
 
-    api(project(":terraformEntities"))
+    api(project(":entities"))
 
     implementation("com.squareup", "kotlinpoet", "1.6.0")
     implementation("com.squareup.moshi", "moshi", "1.8.0")

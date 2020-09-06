@@ -1,16 +1,24 @@
 package io.terraformkt.plugin
 
+import io.terraformkt.plugin.tasks.DownloadSchemaTask
+import io.terraformkt.plugin.tasks.DownloadTerraformTask
+import io.terraformkt.plugin.tasks.GenerateTerraformTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 
 class TerraformKtPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         // TODO logging
-        if (terraformKt.generationPath == null || terraformKt.jsonSchemaFile == null) {
-            println("Specify generation path and json schema file")
+        if (terraformKt.generationPath == null) {
+            println("Specify generation path and json schema file ${terraformKt.generationPath}")
             return
         }
+
+//        target.dependencies {
+//            dependencies.add("implementation", "(project(\":entities\"))")
+//        }
 
         target.afterEvaluate {
             target.mySourceSets.apply {
