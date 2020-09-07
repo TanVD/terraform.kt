@@ -32,8 +32,22 @@ open class GenerateTerraformTask : DefaultTask() {
 
     @TaskAction
     fun act() {
+        if (terraformKt.downLoadTerraformPath == null) {
+            logger.error("downLoadTerraformPath is not specified")
+        }
+        if (terraformKt.tfProvider == null) {
+            logger.error("tfProvider is not specified")
+        }
+        if (terraformKt.generationPath == null) {
+            logger.error("generationPath is not specified")
+        }
+
         try {
-            TerraformGenerator(terraformKt.downLoadTerraformPath!!.normalize().resolve("schema.json"), terraformKt.generationPath!!).generate()
+            TerraformGenerator(
+                terraformKt.downLoadTerraformPath!!.normalize().resolve("schema.json"),
+                terraformKt.generationPath!!,
+                terraformKt.tfProvider!!
+            ).generate()
         } catch (e: Exception) {
             e.printStackTrace()
         }

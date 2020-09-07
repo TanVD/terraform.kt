@@ -35,14 +35,14 @@ internal object CommandLine {
         )
     }
 
-    fun executeOrFail(exec: String, args: List<String>, workingDir: File, redirectStdout: Boolean = false, redirectErr: Boolean = true){
+    fun executeOrFail(exec: String, args: List<String>, workingDir: File, redirectStdout: Boolean = false, redirectErr: Boolean = true) {
         val returnCode = execute(exec, args, workingDir, redirectStdout, redirectErr)
         if (returnCode != 0) {
             error("Command failed: '$exec ${args.joinToString { " " }}'")
         }
     }
 
-    fun executeOrFailToFile(exec: String, args: List<String>, workingDir: File, stdoutFile: File, redirectErr: Boolean = true){
+    fun executeOrFailToFile(exec: String, args: List<String>, workingDir: File, stdoutFile: File, redirectErr: Boolean = true) {
         val returnCode = executeToFile(exec, args, workingDir, stdoutFile, redirectErr)
         if (returnCode != 0) {
             error("Command failed: '$exec ${args.joinToString { " " }}'")

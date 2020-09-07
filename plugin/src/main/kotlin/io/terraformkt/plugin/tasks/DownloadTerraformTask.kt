@@ -7,7 +7,9 @@ import io.terraformkt.utils.CommandLine.os
 import io.terraformkt.utils.Downloads
 import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.net.URL
 
@@ -26,11 +28,18 @@ open class DownloadTerraformTask : DefaultTask() {
 
     @TaskAction
     fun download() {
-        println("Downloading terraform version $version for OS $os")
+        if (terraformKt.downLoadTerraformPath == null) {
+            logger.error("downLoadTerraformPath is not specified")
+        }
+        if (terraformKt.tfVersion == null) {
+            logger.error("tfVersion is not specified")
+        }
+
+        logger.lifecycle("Downloading terraform version $version for OS $os")
         Downloads.download(URL("https://releases.hashicorp.com/terraform/$version/terraform_${version}_$os.zip"), file!!.parentFile, Archive.ZIP)
 
         CommandLine.execute("chmod", listOf("+x", file!!.absolutePath), file!!.parentFile, false)
 
-        println("Terraform version $version for OS $os successfully downloaded")
+        logger.lifecycle("Terraform version $version for OS $os successfully downloaded")
     }
 }

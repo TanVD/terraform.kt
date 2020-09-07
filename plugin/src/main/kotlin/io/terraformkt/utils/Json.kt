@@ -5,8 +5,8 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 object Json {
     val moshi: Moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
+        .add(KotlinJsonAdapterFactory())
+        .build()
 
     inline fun <reified T> string(value: T): String = moshi.adapter(T::class.java).toJson(value)
     inline fun <reified T> pretty(value: T): String = moshi.adapter(T::class.java).indent(" ".repeat(4)).toJson(value)
