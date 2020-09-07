@@ -26,7 +26,3 @@ object Text {
 
     fun indent(number: Int = indent) = " ".repeat(number)
 }
-
-fun String.withIndent(number: Int = Text.indent) = prependIndent(Text.indent(number))
-
-fun String.plusIterable(value: Iterable<String>) = listOf(this) + value.toList()

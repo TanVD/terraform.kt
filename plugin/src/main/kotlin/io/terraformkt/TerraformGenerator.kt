@@ -29,7 +29,7 @@ class TerraformGenerator(
         generateFiles(data, ResourceType.DATA)
     }
 
-    private fun generateFiles(resources: Map<String, Resource>, resourceType: ResourceType) {
+    private fun generateFiles(resources: Map<String, Configuration>, resourceType: ResourceType) {
         for (resourceName in resources.keys) {
             val className = snakeToCamelCase(removeProviderPrefix(resourceName))
 

@@ -10,9 +10,6 @@ enum class Archive(val extension: String) {
     ZIP("zip") {
         override fun getUnarchiver(from: File) = ZipUnArchiver(from)
     },
-    TARGZ("tar.gz") {
-        override fun getUnarchiver(from: File) = TarGZipUnArchiver(from)
-    };
 
     companion object {
         private const val plexusErrorLoggerLevel = 5

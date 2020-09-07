@@ -49,7 +49,7 @@ open class GenerateTerraformTask : DefaultTask() {
                 terraformKt.tfProvider!!
             ).generate()
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.error(e.message)
         }
     }
 }

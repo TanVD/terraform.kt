@@ -5,6 +5,7 @@ data class Schema(
     val provider_schemas: Map<String, AWS>
 )
 
-data class AWS(val resource_schemas: Map<String, Resource>, val data_source_schemas: Map<String, Resource>)
-data class Resource(val version: Int, val block: ResourceBlock)
-data class ResourceBlock(val attributes: Map<String, Map<String, Any>>)
+data class AWS(val resource_schemas: Map<String, Configuration>, val data_source_schemas: Map<String, Configuration>)
+
+data class Configuration(val version: Int, val block: ConfigurationBlock)
+data class ConfigurationBlock(val attributes: Map<String, Map<String, Any>>)
