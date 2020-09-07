@@ -22,6 +22,10 @@ apply {
     plugin("io.terraformkt.gradle.plugin")
 }
 
+dependencies {
+    implementation(kotlin("stdlib"))
+}
+
 terraformKt {
     generationPath = File("generated")
     tfVersion = "0.13.0"
