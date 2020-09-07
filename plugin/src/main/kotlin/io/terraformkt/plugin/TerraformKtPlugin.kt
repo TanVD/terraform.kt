@@ -13,6 +13,10 @@ class TerraformKtPlugin : Plugin<Project> {
             target.mySourceSets.apply {
                 this["main"].java.srcDir(terraformKt.generationPath!!)
             }
+
+            target.configurations.getByName("implementation").dependencies.add(
+                target.dependencies.add("implementation", "io.terraformkt:entities:0.1.0")
+            )
         }
 
         target.tasks.create("generateTerraform", GenerateTerraformTask::class.java)

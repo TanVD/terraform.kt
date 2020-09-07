@@ -6,28 +6,16 @@ version = rootProject.version
 buildscript {
     repositories {
         mavenLocal()
-
-        // Can't find terraformEntities without it.
-        flatDir {
-            dirs("../build/entities/libs")
-        }
+        jcenter()
     }
     dependencies {
         classpath("io.terraformkt:plugin:0.1.0")
     }
 }
 
-plugins {
-    id("java-gradle-plugin")
-    id("maven")
-}
-
 repositories {
+    mavenLocal()
     jcenter()
-}
-
-dependencies {
-    implementation(project(":entities"))
 }
 
 apply {
