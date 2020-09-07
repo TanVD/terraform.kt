@@ -9,7 +9,7 @@ import java.io.File
 enum class Archive(val extension: String) {
     ZIP("zip") {
         override fun getUnarchiver(from: File) = ZipUnArchiver(from)
-    },
+    };
 
     companion object {
         private const val plexusErrorLoggerLevel = 5
