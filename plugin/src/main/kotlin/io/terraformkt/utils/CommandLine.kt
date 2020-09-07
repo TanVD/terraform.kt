@@ -34,7 +34,7 @@ internal object CommandLine {
     }
 
     fun executeOrFailToFile(exec: String, args: List<String>, workingDir: File, stdoutFile: File, redirectErr: Boolean = true) {
-        executeOrFailToFile(exec, args, workingDir, stdoutFile, redirectErr)
+        executeOrFail(exec, args, workingDir, WriterStreamConsumer(FileWriter(stdoutFile)), getConsumer(redirectErr))
     }
 
     fun executeOrFail(exec: String, args: List<String>, workingDir: File, stdoutConsumer: StreamConsumer, errConsumer: StreamConsumer) {
