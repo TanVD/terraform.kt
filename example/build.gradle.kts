@@ -35,7 +35,7 @@ apply {
 }
 
 terraformKt {
-    generationPath = File("generated1")
+    generationPath = File("generated")
     tfVersion = "0.13.0"
     tfProvider = "aws"
     schemaVersion = "2.70.0"

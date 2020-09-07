@@ -4,7 +4,7 @@ import io.terraformkt.plugin.terraformKt
 import io.terraformkt.utils.CommandLine
 import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -14,8 +14,9 @@ open class DownloadSchemaTask : DefaultTask() {
         outputs.upToDateWhen { false }
     }
 
-    @get:InputDirectory
-    var root: File = terraformKt.downLoadTerraformPath!!
+    // TODO no idea why this throws NPE.
+//    @get:InputFile
+//    val root: File = terraformKt.downLoadTerraformPath!!.normalize()
 
     @TaskAction
     fun execOperation() {
@@ -29,6 +30,8 @@ open class DownloadSchemaTask : DefaultTask() {
             logger.error("schemaVersion is not specified")
         }
 
+        val root: File = terraformKt.downLoadTerraformPath!!.normalize()
+
         val terraformPath = root.resolve("terraform").absolutePath
         createConfigFile(terraformKt.tfProvider!!, terraformKt.schemaVersion!!)
 
@@ -37,7 +40,6 @@ open class DownloadSchemaTask : DefaultTask() {
             terraformPath, listOf("providers", "schema", "-json"), root,
             root.resolve("schema.json"), redirectErr = true
         )
-
     }
 
     private fun createConfigFile(tfProvider: String, schemaVersion: String) {
