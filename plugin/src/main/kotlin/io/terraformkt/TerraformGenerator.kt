@@ -22,8 +22,8 @@ class TerraformGenerator(
         val jsonString = pathToSchema.readText()
         val schema = Json.parse<Schema>(jsonString)
 
-        val resources = schema.provider_schemas.values.toList()[0].resource_schemas
-        val data = schema.provider_schemas.values.toList()[0].data_source_schemas
+        val resources = schema.provider_schemas.values.single().resource_schemas
+        val data = schema.provider_schemas.values.single().data_source_schemas
 
         generateFiles(resources, ResourceType.RESOURCE)
         generateFiles(data, ResourceType.DATA)
@@ -78,9 +78,10 @@ class TerraformGenerator(
     }
 
     private fun getType(attr: Map<String, Any>): Type {
-        if (!attr.containsKey("type")) {
-            throw IllegalStateException("No type parameter")
+        require(attr.containsKey("type")) {
+            "No type parameter for the attribute."
         }
+
         if (attr["type"] is String) {
             when (attr["type"]) {
                 "string" -> return Type.STRING

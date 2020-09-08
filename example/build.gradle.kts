@@ -18,18 +18,22 @@ repositories {
     jcenter()
 }
 
-apply {
-    plugin("io.terraformkt.gradle.plugin")
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
 }
 
+apply {
+    plugin("io.terraformkt.gradle.plugin")
+}
+
 terraformKt {
     generationPath = File("generated")
-    tfVersion = "0.13.0"
-    tfProvider = "aws"
-    schemaVersion = "2.70.0"
-    downLoadTerraformPath = File("tf")
+    provider {
+        name = "aws"
+        version = "2.70.0"
+    }
+    terraform {
+        version = "0.13.0"
+        downloadPath = File("tf")
+    }
 }

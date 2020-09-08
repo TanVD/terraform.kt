@@ -20,18 +20,18 @@ open class DownloadTerraformTask : DefaultTask() {
 
     @get:Input
     val version: String?
-        get() = terraformKt.tfVersion
+        get() = terraformKt.terraform.version
 
     @get:OutputFile
     val file: File?
-        get() = terraformKt.downLoadTerraformPath!!.normalize().resolve("terraform")
+        get() = terraformKt.terraform.downloadPath!!.normalize().resolve("terraform")
 
     @TaskAction
     fun download() {
-        if (terraformKt.downLoadTerraformPath == null) {
+        if (terraformKt.terraform.downloadPath == null) {
             logger.error("downLoadTerraformPath is not specified")
         }
-        if (terraformKt.tfVersion == null) {
+        if (version == null) {
             logger.error("tfVersion is not specified")
         }
 

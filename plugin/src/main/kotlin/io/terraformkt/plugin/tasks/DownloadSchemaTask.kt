@@ -4,7 +4,7 @@ import io.terraformkt.plugin.terraformKt
 import io.terraformkt.utils.CommandLine
 import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -14,26 +14,24 @@ open class DownloadSchemaTask : DefaultTask() {
         outputs.upToDateWhen { false }
     }
 
-    // TODO no idea why this throws NPE.
-//    @get:InputFile
-//    val root: File = terraformKt.downLoadTerraformPath!!.normalize()
+    @get:InputDirectory
+    val root: File
+        get() = terraformKt.terraform.downloadPath!!.normalize()
 
     @TaskAction
     fun execOperation() {
-        if (terraformKt.downLoadTerraformPath == null) {
+        if (terraformKt.terraform.downloadPath == null) {
             logger.error("downLoadTerraformPath is not specified")
         }
-        if (terraformKt.tfProvider == null) {
+        if (terraformKt.provider.name == null) {
             logger.error("tfProvider is not specified")
         }
-        if (terraformKt.schemaVersion == null) {
+        if (terraformKt.provider.version == null) {
             logger.error("schemaVersion is not specified")
         }
 
-        val root: File = terraformKt.downLoadTerraformPath!!.normalize()
-
         val terraformPath = root.resolve("terraform").absolutePath
-        createConfigFile(terraformKt.tfProvider!!, terraformKt.schemaVersion!!)
+        createConfigFile(terraformKt.provider.name!!, terraformKt.provider.version!!)
 
         CommandLine.executeOrFail(terraformPath, listOf("init"), root, redirectStdout = true, redirectErr = true)
         CommandLine.executeOrFailToFile(
@@ -43,7 +41,7 @@ open class DownloadSchemaTask : DefaultTask() {
     }
 
     private fun createConfigFile(tfProvider: String, schemaVersion: String) {
-        val configFile = terraformKt.downLoadTerraformPath!!.normalize().resolve("config.tf")
+        val configFile = terraformKt.terraform.downloadPath!!.normalize().resolve("config.tf")
         configFile.createNewFile()
         configFile.writeText(
             """

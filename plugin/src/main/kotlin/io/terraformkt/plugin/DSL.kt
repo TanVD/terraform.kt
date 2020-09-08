@@ -5,17 +5,35 @@ import java.io.File
 @DslMarker
 annotation class TerraformKtDSLTag
 
-open class TerraformKtPluginExtension {
+open class TerraformKt {
     var generationPath: File? = null
-    var tfVersion: String? = null
-    var tfProvider: String? = null
-    var downLoadTerraformPath: File? = null
-    var schemaVersion: String? = null
+
+    var provider: Provider = Provider()
+
+    var terraform: Terraform = Terraform()
+
+    open class Provider {
+        var name: String? = null
+        var version: String? = null
+    }
+
+    open class Terraform {
+        var version: String? = null
+        var downloadPath: File? = null
+    }
+
+    fun provider(configure: Provider.() -> Unit) {
+        provider.configure()
+    }
+
+    fun terraform(configure: Terraform.() -> Unit) {
+        terraform.configure()
+    }
 }
 
-var terraformKt = TerraformKtPluginExtension()
+var terraformKt = TerraformKt()
 
 @TerraformKtDSLTag
-fun terraformKt(configure: TerraformKtPluginExtension.() -> Unit) {
+fun terraformKt(configure: TerraformKt.() -> Unit) {
     terraformKt.configure()
 }
