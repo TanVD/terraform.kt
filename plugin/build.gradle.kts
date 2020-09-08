@@ -1,16 +1,8 @@
 import tanvd.kosogor.proxy.publishJar
+import tanvd.kosogor.proxy.publishPlugin
 
 group = rootProject.group
 version = rootProject.version
-
-plugins {
-    id("java-gradle-plugin")
-    id("maven")
-}
-
-repositories {
-    jcenter()
-}
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -34,11 +26,9 @@ dependencies {
 
 publishJar {}
 
-gradlePlugin {
-    plugins {
-        create("terraformKtPlugin") {
-            id = "io.terraformkt.gradle.plugin"
-            implementationClass = "io.terraformkt.plugin.TerraformKtPlugin"
-        }
-    }
+publishPlugin {
+    id = "io.terraformkt"
+    displayName = "Terraform.kt"
+    implementationClass = "io.terraformkt.plugin.TerraformKtPlugin"
+    version = project.version.toString()
 }
