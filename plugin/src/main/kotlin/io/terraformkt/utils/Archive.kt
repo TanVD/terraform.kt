@@ -1,7 +1,6 @@
 package io.terraformkt.utils
 
 import org.codehaus.plexus.archiver.AbstractUnArchiver
-import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver
 import org.codehaus.plexus.logging.console.ConsoleLogger
 import java.io.File

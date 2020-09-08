@@ -2,7 +2,6 @@ package io.terraformkt.plugin.tasks
 
 import io.terraformkt.TerraformGenerator
 import io.terraformkt.plugin.terraformKt
-import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
@@ -19,18 +18,17 @@ open class GenerateTerraformTask : DefaultTask() {
         get() = terraformKt.provider.name
 
     @get:OutputDirectory
-    val generationPath: File?
-        get() = terraformKt.generationPath
+    val generationPath: File
+        get() = terraformKt.getGenerationPathOrDefault(project)
 
     @TaskAction
     fun act() {
         require(providerName != null) { "provider name is not specified" }
-        require(generationPath != null) { "generationPath is not specified" }
 
         try {
             TerraformGenerator(
-                terraformKt.terraform.downloadPath!!.normalize().resolve("schema.json"),
-                generationPath!!,
+                terraformKt.terraform.getDownloadPathOrDefault(project).resolve("schema.json"),
+                generationPath,
                 providerName!!
             ).generate()
         } catch (e: Exception) {

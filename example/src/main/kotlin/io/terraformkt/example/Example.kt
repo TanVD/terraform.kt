@@ -2,15 +2,14 @@ package io.terraformkt.example
 
 //import io.terraformkt.aws.resource_schemas.lambda_function
 
-import io.terraformkt.hcl.HCLEntity
+import io.terraformkt.aws.resource_schemas.lambda.lambda_function
+import io.terraformkt.terraform.tf
 
 fun main() {
-//    val lambda = lambda_function("name") {
-//        function_name = "function name"
-//        handler = "handler"
-//    }
-//
-//    println(lambda.function_name)
-    val h: HCLEntity? = null
+    val file = tf("my_file") {
+        lambda_function("my_lambda_function") {
+            this.description = "My Description"
+        }
+    }
 }
 
