@@ -40,11 +40,13 @@ class HCLTextField(name: String, inner: Boolean, owner: HCLEntity, value: String
 /** Field with text list owned by HCL entity */
 class HCLTextListField(name: String, inner: Boolean, owner: HCLEntity, value: Array<String>?) : HCLField<Array<String>>(name, inner, owner, value) {
     override fun render(): String {
-        return "$hcl_name = ${value!!.sortedArray().joinToString(prefix = "[", postfix = "]") {
-            HCLTextField.toText(
-                it
-            )
-        } }"
+        return "$hcl_name = ${
+            value!!.sortedArray().joinToString(prefix = "[", postfix = "]") {
+                HCLTextField.toText(
+                    it
+                )
+            }
+        }"
     }
 }
 
