@@ -45,7 +45,7 @@ class TerraformGenerator(
                 .addSuperclassConstructorParameter("id")
                 .addSuperclassConstructorParameter("\"$resourceName\"")
 
-            for ((attrName, attr) in resources[resourceName]!!.block.attributes) {
+            for ((attrName, attr) in resources.getValue(resourceName).block.attributes) {
                 val type = getType(attr)
 
                 // TODO support all types

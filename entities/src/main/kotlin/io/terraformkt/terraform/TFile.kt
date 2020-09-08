@@ -4,7 +4,7 @@ import io.terraformkt.hcl.HCLEntity
 import java.io.File
 
 /** Representation of file with Terraform code */
-public class TFFile(val name: String, private val entities: MutableList<HCLEntity.Named> = ArrayList()): Comparable<TFFile>  {
+class TFFile(val name: String, private val entities: MutableList<HCLEntity.Named> = ArrayList()): Comparable<TFFile>  {
     private val nameWithExt = "$name.tf"
 
     fun writeToDirectory(directory: File): File {

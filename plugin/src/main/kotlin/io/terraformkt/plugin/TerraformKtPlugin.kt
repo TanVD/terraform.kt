@@ -7,6 +7,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.get
 
+@Suppress("unused")
 class TerraformKtPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.afterEvaluate {
@@ -22,5 +23,9 @@ class TerraformKtPlugin : Plugin<Project> {
         val downloadTerraform = target.tasks.create("downloadTerraform", DownloadTerraformTask::class.java)
         val downloadSchema = target.tasks.create("downloadSchema", DownloadSchemaTask::class.java).dependsOn(downloadTerraform)
         val generateTerraform = target.tasks.create("generateTerraform", GenerateTerraformTask::class.java).dependsOn(downloadSchema)
+
+        target.afterEvaluate {
+            target.tasks["classes"].dependsOn(generateTerraform)
+        }
     }
 }
