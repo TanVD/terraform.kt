@@ -15,16 +15,8 @@ open class GenerateTerraformTask : DefaultTask() {
     }
 
     @get:Input
-    val tfVersion: String?
-        get() = terraformKt.provider.version
-
-    @get:Input
-    val tfProvider: String?
+    val providerName: String?
         get() = terraformKt.provider.name
-
-    @get:Input
-    val schemaVersion: String?
-        get() = terraformKt.terraform.version
 
     @get:OutputDirectory
     val generationPath: File?
@@ -32,21 +24,14 @@ open class GenerateTerraformTask : DefaultTask() {
 
     @TaskAction
     fun act() {
-        if (terraformKt.terraform.downloadPath == null) {
-            logger.error("downLoadTerraformPath is not specified")
-        }
-        if (tfProvider == null) {
-            logger.error("tfProvider is not specified")
-        }
-        if (generationPath == null) {
-            logger.error("generationPath is not specified")
-        }
+        require(providerName != null) { "provider name is not specified" }
+        require(generationPath != null) { "generationPath is not specified" }
 
         try {
             TerraformGenerator(
                 terraformKt.terraform.downloadPath!!.normalize().resolve("schema.json"),
-                terraformKt.generationPath!!,
-                tfProvider!!
+                generationPath!!,
+                providerName!!
             ).generate()
         } catch (e: Exception) {
             logger.error("Exception happened during generation of Terraform DSL", e)

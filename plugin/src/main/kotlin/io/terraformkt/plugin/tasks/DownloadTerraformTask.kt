@@ -8,6 +8,7 @@ import io.terraformkt.utils.Downloads
 import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -22,23 +23,23 @@ open class DownloadTerraformTask : DefaultTask() {
     val version: String?
         get() = terraformKt.terraform.version
 
+    @get:InputDirectory
+    val downloadPath: File?
+        get() = terraformKt.terraform.downloadPath!!.normalize()
+
     @get:OutputFile
-    val file: File?
-        get() = terraformKt.terraform.downloadPath!!.normalize().resolve("terraform")
+    val terraformFile: File?
+        get() = downloadPath!!.normalize().resolve("terraform")
 
     @TaskAction
     fun download() {
-        if (terraformKt.terraform.downloadPath == null) {
-            logger.error("downLoadTerraformPath is not specified")
-        }
-        if (version == null) {
-            logger.error("tfVersion is not specified")
-        }
+        require(downloadPath != null) { "terraform downloadPath is not specified" }
+        require(version != null) { "terraform version is not specified" }
 
         logger.lifecycle("Downloading terraform version $version for OS $os")
-        Downloads.download(URL("https://releases.hashicorp.com/terraform/$version/terraform_${version}_$os.zip"), file!!.parentFile, Archive.ZIP)
+        Downloads.download(URL("https://releases.hashicorp.com/terraform/$version/terraform_${version}_$os.zip"), downloadPath!!, Archive.ZIP)
 
-        CommandLine.execute("chmod", listOf("+x", file!!.absolutePath), file!!.parentFile, false)
+        CommandLine.execute("chmod", listOf("+x", terraformFile!!.absolutePath), downloadPath!!, false)
 
         logger.lifecycle("Terraform version $version for OS $os successfully downloaded")
     }

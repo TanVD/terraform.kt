@@ -1,7 +1,6 @@
 package io.terraformkt.utils
 
 import io.terraformkt.TerraformGenerator
-import java.io.File
 
 class NamesUtils(private val provider: String) {
     private val mappings = getMappings()
@@ -21,12 +20,9 @@ class NamesUtils(private val provider: String) {
         return "$PACKAGE_PREFIX.$provider.${getDirectoryName(resourceType)}.${getClassPackageName(className)}"
     }
 
-    private fun getMappings(): Map<String, String>? {
-        val mappingFile = File("src/main/resources/package_mapping.json")
-        if (!mappingFile.exists()) {
-            return null
-        }
-        return Json.parse<Map<String, String>>(mappingFile.readText())
+    private fun getMappings(): Map<String, String> {
+        val mappings = javaClass.classLoader.getResource("package_mapping.json").readText()
+        return Json.parse(mappings)
     }
 
     private fun getDirectoryName(resourceType: TerraformGenerator.ResourceType): String {
@@ -37,11 +33,9 @@ class NamesUtils(private val provider: String) {
     }
 
     private fun getClassPackageName(className: String): String {
-        if (mappings != null) {
-            val packageNameEntry = mappings.entries.find { entry -> className.startsWith(entry.key) }
-            if (packageNameEntry != null) {
-                return packageNameEntry.value
-            }
+        val packageNameEntry = mappings.entries.find { entry -> className.startsWith(entry.key) }
+        if (packageNameEntry != null) {
+            return packageNameEntry.value
         }
         return getFirstWordCamelCase(className).toLowerCase()
     }

@@ -4,6 +4,7 @@ import io.terraformkt.plugin.terraformKt
 import io.terraformkt.utils.CommandLine
 import io.terraformkt.utils.normalize
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -11,32 +12,37 @@ import java.io.File
 open class DownloadSchemaTask : DefaultTask() {
     init {
         group = "terraformkt"
+
+        // TODO maybe remove it
         outputs.upToDateWhen { false }
     }
 
+    @get:Input
+    val providerName: String?
+        get() = terraformKt.provider.name
+
+    @get:Input
+    val providerVersion: String?
+        get() = terraformKt.provider.version
+
     @get:InputDirectory
-    val root: File
+    val downloadPath: File?
         get() = terraformKt.terraform.downloadPath!!.normalize()
 
     @TaskAction
-    fun execOperation() {
-        if (terraformKt.terraform.downloadPath == null) {
-            logger.error("downLoadTerraformPath is not specified")
-        }
-        if (terraformKt.provider.name == null) {
-            logger.error("tfProvider is not specified")
-        }
-        if (terraformKt.provider.version == null) {
-            logger.error("schemaVersion is not specified")
-        }
+    fun download() {
+        require(providerName != null) { "provider name is not specified" }
+        require(providerVersion != null) { "provider version is not specified " }
+        require(downloadPath != null) { "terraform downloadPath is not specified" }
 
-        val terraformPath = root.resolve("terraform").absolutePath
-        createConfigFile(terraformKt.provider.name!!, terraformKt.provider.version!!)
 
-        CommandLine.executeOrFail(terraformPath, listOf("init"), root, redirectStdout = true, redirectErr = true)
+        val terraformPath = downloadPath!!.resolve("terraform").absolutePath
+        createConfigFile(providerName!!, providerVersion!!)
+
+        CommandLine.executeOrFail(terraformPath, listOf("init"), downloadPath!!, redirectStdout = true, redirectErr = true)
         CommandLine.executeOrFailToFile(
-            terraformPath, listOf("providers", "schema", "-json"), root,
-            root.resolve("schema.json"), redirectErr = true
+            terraformPath, listOf("providers", "schema", "-json"), downloadPath!!,
+            downloadPath!!.resolve("schema.json"), redirectErr = true
         )
     }
 
