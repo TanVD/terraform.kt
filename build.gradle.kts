@@ -6,13 +6,15 @@ plugins {
     kotlin("jvm") version "1.3.72" apply true
 }
 
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
 subprojects {
     apply {
         plugin("kotlin")
         plugin("tanvd.kosogor")
-    }
-
-    repositories {
-        jcenter()
     }
 }

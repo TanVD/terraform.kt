@@ -11,7 +11,7 @@ class TerraformKtPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.afterEvaluate {
             target.mySourceSets.apply {
-                this["main"].java.srcDir(terraformKt.generationPath!!)
+                this["main"].kotlin.srcDir(terraformKt.generationPath!!)
             }
 
             target.configurations.getByName("implementation").dependencies.add(

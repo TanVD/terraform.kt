@@ -1,3 +1,5 @@
+import tanvd.kosogor.proxy.publishJar
+
 group = rootProject.group
 version = rootProject.version
 
@@ -12,10 +14,12 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+
     implementation(kotlin("reflect"))
 
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
+    implementation(kotlin("gradle-plugin-api"))
 
     api(project(":entities"))
 
@@ -27,6 +31,8 @@ dependencies {
     implementation("org.codehaus.plexus", "plexus-archiver", "4.1.0")
     implementation("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-30")
 }
+
+publishJar {}
 
 gradlePlugin {
     plugins {
