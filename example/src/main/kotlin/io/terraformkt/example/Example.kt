@@ -1,8 +1,6 @@
 package io.terraformkt.example
 
-//import io.terraformkt.aws.resource_schemas.lambda_function
-
-import io.terraformkt.aws.resource_schemas.lambda.lambda_function
+import io.terraformkt.aws.resource.lambda.lambda_function
 import io.terraformkt.terraform.tf
 
 fun main() {

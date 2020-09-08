@@ -8,8 +8,8 @@ class NamesUtils(private val provider: String) {
     companion object {
         private const val PACKAGE_PREFIX = "io.terraformkt"
         private const val PATH_PREFIX = "io/terraformkt"
-        private const val RESOURCES_DIRECTORY_NAME = "resource_schemas"
-        private const val DATA_DIRECTORY_NAME = "data_source_schemas"
+        private const val RESOURCES_DIRECTORY_NAME = "resource"
+        private const val DATA_DIRECTORY_NAME = "data"
     }
 
     fun getClassFilePath(resourceType: TerraformGenerator.ResourceType, className: String): String {
