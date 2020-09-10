@@ -9,7 +9,6 @@ import io.terraformkt.terraform.TFResource
 import io.terraformkt.utils.Json
 import io.terraformkt.utils.NamesUtils
 import io.terraformkt.utils.Text.snakeToCamelCase
-import io.terraformkt.utils.myMkdirs
 import java.io.File
 
 class TerraformGenerator(
@@ -67,7 +66,7 @@ class TerraformGenerator(
 
 
             val file = generationPath.resolve(packageNameProvider.getClassFilePath(resourceType, className))
-            file.parentFile.myMkdirs()
+            file.parentFile.mkdirs()
             file.createNewFile()
 
             fileBuilder
