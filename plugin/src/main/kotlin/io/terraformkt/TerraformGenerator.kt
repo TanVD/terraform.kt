@@ -128,7 +128,7 @@ class TerraformGenerator(
         return this.addKdoc(
             """Terraform $resourceName resource.
             | 
-            | @see <a href="https://www.io.terraformkt.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+            | @see <a href="https://www.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
         """.trimMargin()
         )
     }
