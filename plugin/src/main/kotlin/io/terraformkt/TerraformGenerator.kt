@@ -45,6 +45,39 @@ class TerraformGenerator(
             generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
         }
 
+        if (provider.block.block_types != null) {
+            for ((blockTypeName, blockType) in provider.block.block_types) {
+                val blockTypeClassName = snakeToCamelCase(blockTypeName)
+
+                val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
+                    .superclass(HCLEntity.Inner::class)
+                    .addSuperclassConstructorParameter("\"$blockTypeName\"")
+                if (blockType.nesting_mode != "list" && blockType.nesting_mode != "set") {
+                    // TODO support others
+                    continue
+                }
+                if (blockType.block.attributes == null) {
+                    // TODO support others
+                    continue
+                }
+                for ((attributeName, attribute) in blockType.block.attributes) {
+                    generateProperty(attributeName, attribute)?.let { blockTypeClassBuilder.addProperty(it) }
+                }
+                resourceClassBuilder.addType(blockTypeClassBuilder.build())
+                resourceClassBuilder.addFunction(
+                    FunSpec.builder(blockTypeClassName.decapitalize())
+                        .addParameter(
+                            "configure", LambdaTypeName.get(
+                                returnType = UNIT,
+                                receiver = TypeVariableName(blockTypeClassName)
+                            )
+                        )
+                        .addStatement("inner(%N().apply(configure))", blockTypeClassName)
+                        .build()
+                )
+            }
+        }
+
         val file = generationPath.resolve(packageNameProvider.getProviderFilePath())
         file.parentFile.mkdirs()
         file.createNewFile()
