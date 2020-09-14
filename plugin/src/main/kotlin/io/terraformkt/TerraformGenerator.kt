@@ -41,6 +41,9 @@ class TerraformGenerator(
             .addSuperClass(ResourceType.PROVIDER)
             .addSuperclassConstructorParameter("\"$providerName\"")
 
+        // TODO: why isn't it specified in schema?
+        resourceClassBuilder.addProperty(generateProviderProperty())
+
         for ((attributeName, attribute) in provider.block.attributes) {
             generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
         }
@@ -145,6 +148,16 @@ class TerraformGenerator(
         if (attribute.containsKey("description")) {
             propertyBuilder.addKdoc(attribute["description"] as String)
         }
+
+        return propertyBuilder.build()
+    }
+
+    private fun generateProviderProperty(): PropertySpec {
+        val type = Type.STRING
+        val propertyBuilder = PropertySpec
+            .builder("provider", type.typeName)
+            .delegate(typeToDelegate(type, false))
+            .mutable(true)
 
         return propertyBuilder.build()
     }
