@@ -19,6 +19,7 @@ class TFConfig : HCLEntity.Named() {
 
     var required_version by text()
 
+    // TODO support all backends
     sealed class Backend(val type: String) : HCLEntity() {
         override fun render(): String {
             return """
@@ -63,7 +64,30 @@ class TFConfig : HCLEntity.Named() {
             var endpoint by text()
             var snapshot by bool()
 
-            // TODO support other authenticating methods.
+            // Authenticating using MSI abd Service Principal
+            var subscription_id by text()
+            var tenant_id by text()
+
+            // Authenticating using MSI
+            var msi_endpoint by text()
+            var use_msi by text()
+
+            //  Authenticating using a SAS Token associated with the Storage Account
+            var sas_token by text()
+
+            // Authenticating using the Storage Account's Access Key
+            var access_key by text()
+
+            // Authenticating using a Service Principal
+            var resource_group_name by text()
+            var client_id by text()
+
+            // Authenticating using a Service Principal with a Client Certificate
+            var client_certificate_password by text()
+            var client_certificate_path by text()
+
+            // Authenticating using a Service Principal with a Client Secret
+            var client_secret by text()
         }
 
         class GCS : Backend("gcs") {
