@@ -47,34 +47,16 @@ class TerraformGenerator(
 
         if (provider.block.block_types != null) {
             for ((blockTypeName, blockType) in provider.block.block_types) {
-                val blockTypeClassName = snakeToCamelCase(blockTypeName)
-
-                val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
-                    .superclass(HCLEntity.Inner::class)
-                    .addSuperclassConstructorParameter("\"$blockTypeName\"")
-                if (blockType.nesting_mode != "list" && blockType.nesting_mode != "set") {
-                    // TODO support others
+                if (blockType.nesting_mode == "map") {
+                    // TODO support map
                     continue
                 }
                 if (blockType.block.attributes == null) {
-                    // TODO support others
+                    // TODO support other cases
                     continue
                 }
-                for ((attributeName, attribute) in blockType.block.attributes) {
-                    generateProperty(attributeName, attribute)?.let { blockTypeClassBuilder.addProperty(it) }
-                }
-                resourceClassBuilder.addType(blockTypeClassBuilder.build())
-                resourceClassBuilder.addFunction(
-                    FunSpec.builder(blockTypeClassName.decapitalize())
-                        .addParameter(
-                            "configure", LambdaTypeName.get(
-                                returnType = UNIT,
-                                receiver = TypeVariableName(blockTypeClassName)
-                            )
-                        )
-                        .addStatement("inner(%N().apply(configure))", blockTypeClassName)
-                        .build()
-                )
+                resourceClassBuilder.addType(generateBlockTypeClass(blockTypeName, blockType))
+                resourceClassBuilder.addBlockTypeFunction(blockTypeName)
             }
         }
 
@@ -117,6 +99,34 @@ class TerraformGenerator(
                 .addClosureFunctions(removeProviderPrefix(resourceName), className)
             file.writeText(fileBuilder.build().toString())
         }
+    }
+
+    private fun generateBlockTypeClass(blockTypeName: String, blockType: BlockType): TypeSpec {
+        val blockTypeClassName = snakeToCamelCase(blockTypeName)
+        val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
+            .superclass(HCLEntity.Inner::class)
+            .addSuperclassConstructorParameter("\"$blockTypeName\"")
+
+        for ((attributeName, attribute) in blockType.block.attributes!!) {
+            generateProperty(attributeName, attribute)?.let { blockTypeClassBuilder.addProperty(it) }
+        }
+
+        return blockTypeClassBuilder.build()
+    }
+
+    private fun TypeSpec.Builder.addBlockTypeFunction(blockTypeName: String): TypeSpec.Builder {
+        val blockTypeClassName = snakeToCamelCase(blockTypeName)
+        return this.addFunction(
+            FunSpec.builder(blockTypeClassName.decapitalize())
+                .addParameter(
+                    "configure", LambdaTypeName.get(
+                        returnType = UNIT,
+                        receiver = TypeVariableName(blockTypeClassName)
+                    )
+                )
+                .addStatement("inner(%N().apply(configure))", blockTypeClassName)
+                .build()
+        )
     }
 
     private fun generateProperty(attributeName: String, attribute: Map<String, Any>): PropertySpec? {
