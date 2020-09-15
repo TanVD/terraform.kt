@@ -177,7 +177,7 @@ class TerraformGenerator(
 
         if (attr["type"] is ArrayList<*>) {
             val typeMap = attr["type"] as ArrayList<*>
-            if (typeMap[0] == "list" && typeMap[1] is String) {
+            if ((typeMap[0] == "list" || typeMap[0] == "set") && typeMap[1] is String) {
                 when (typeMap[1]) {
                     "string" -> return Type.STRING_LIST
                     "number" -> return Type.NUMBER_LIST
@@ -186,7 +186,7 @@ class TerraformGenerator(
             }
         }
 
-        // TODO support map, set and list of objects
+        // TODO support map
         return Type.ANY
     }
 
