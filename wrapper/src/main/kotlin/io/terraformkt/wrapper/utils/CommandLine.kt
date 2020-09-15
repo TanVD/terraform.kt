@@ -1,4 +1,4 @@
-package io.terraformkt.utils
+package io.terraformkt.wrapper.utils
 
 import org.codehaus.plexus.util.Os
 import org.codehaus.plexus.util.cli.*
@@ -16,7 +16,13 @@ internal object CommandLine {
     }
 
     fun execute(exec: String, args: List<String>, workingDir: File, redirectStdout: Boolean = false, redirectErr: Boolean = true): Int {
-        return execute(exec, args, workingDir, getConsumer(redirectStdout), getConsumer(redirectErr))
+        return execute(
+            exec,
+            args,
+            workingDir,
+            getConsumer(redirectStdout),
+            getConsumer(redirectErr)
+        )
     }
 
     fun execute(exec: String, args: List<String>, workingDir: File, stdoutConsumer: StreamConsumer, errConsumer: StreamConsumer): Int {
@@ -30,11 +36,23 @@ internal object CommandLine {
     }
 
     fun executeOrFail(exec: String, args: List<String>, workingDir: File, redirectStdout: Boolean = false, redirectErr: Boolean = true) {
-        executeOrFail(exec, args, workingDir, getConsumer(redirectStdout), getConsumer(redirectErr))
+        executeOrFail(
+            exec,
+            args,
+            workingDir,
+            getConsumer(redirectStdout),
+            getConsumer(redirectErr)
+        )
     }
 
     fun executeOrFailToFile(exec: String, args: List<String>, workingDir: File, stdoutFile: File, redirectErr: Boolean = true) {
-        executeOrFail(exec, args, workingDir, WriterStreamConsumer(FileWriter(stdoutFile)), getConsumer(redirectErr))
+        executeOrFail(
+            exec,
+            args,
+            workingDir,
+            WriterStreamConsumer(FileWriter(stdoutFile)),
+            getConsumer(redirectErr)
+        )
     }
 
     fun executeOrFail(exec: String, args: List<String>, workingDir: File, stdoutConsumer: StreamConsumer, errConsumer: StreamConsumer) {
