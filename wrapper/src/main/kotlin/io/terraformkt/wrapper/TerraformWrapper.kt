@@ -1,8 +1,9 @@
 package io.terraformkt.wrapper
 
-import io.terraformkt.wrapper.utils.CommandLine.os
+import io.terraformkt.terraform.TFFile
 import io.terraformkt.wrapper.utils.Archive
 import io.terraformkt.wrapper.utils.CommandLine
+import io.terraformkt.wrapper.utils.CommandLine.os
 import io.terraformkt.wrapper.utils.Downloads
 import java.io.File
 import java.net.URL
@@ -22,6 +23,15 @@ object TerraformWrapper {
         CommandLine.executeOrFailToFile(
             terraformPath, listOf("providers", "schema", "-json"), downloadPath,
             downloadPath.resolve("schema.json"), redirectErr = true
+        )
+    }
+
+    fun applyTerraform(tfFiles: List<TFFile>, terraformExecutable: File, directoryToWriteFiles: File) {
+        tfFiles.forEach { file -> file.writeToDirectory(directoryToWriteFiles) }
+        CommandLine.executeOrFail(
+            terraformExecutable.absolutePath,
+            listOf("apply", "-auto-approve", directoryToWriteFiles.absolutePath),
+            terraformExecutable.parentFile
         )
     }
 
