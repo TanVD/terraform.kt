@@ -16,6 +16,6 @@ fun main() {
                 filename = "hello.txt"
             }
         }
-    }.terraformApply(File("build/example/tf/terraform"))
+    }.terraformApply(File("build/localProvider/tf/terraform"))
 }
 
