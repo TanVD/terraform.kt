@@ -5,6 +5,7 @@ import io.terraformkt.wrapper.utils.Archive
 import io.terraformkt.wrapper.utils.CommandLine
 import io.terraformkt.wrapper.utils.CommandLine.os
 import io.terraformkt.wrapper.utils.Downloads
+import org.codehaus.plexus.util.Os
 import java.io.File
 import java.net.URL
 
@@ -12,8 +13,9 @@ object TerraformWrapper {
     fun downloadTerraform(downloadPath: File, version: String) {
         Downloads.download(URL("https://releases.hashicorp.com/terraform/$version/terraform_${version}_$os.zip"), downloadPath, Archive.ZIP)
 
-        // TODO fix for Windows
-        CommandLine.execute("chmod", listOf("+x", downloadPath.resolve("terraform").absolutePath), downloadPath, false)
+        if (Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_UNIX)) {
+            CommandLine.execute("chmod", listOf("+x", downloadPath.resolve("terraform").absolutePath), downloadPath, false)
+        }
     }
 
     fun downloadSchema(downloadPath: File, terraformProvider: String, schemaVersion: String) {
