@@ -8,6 +8,6 @@ data class Schema(
 data class Schemas(val provider: Configuration, val resource_schemas: Map<String, Configuration>, val data_source_schemas: Map<String, Configuration>)
 
 data class Configuration(val version: Int, val block: ConfigurationBlock)
-data class ConfigurationBlock(val attributes: Map<String, Map<String, Any>>, val block_types: Map<String, BlockType>?)
+data class ConfigurationBlock(val attributes: Map<String, Map<String, Any>>?, val block_types: Map<String, BlockType>?)
 data class BlockType(val nesting_mode: String, val block: BlockTypeBlock)
 data class BlockTypeBlock(val attributes: Map<String, Map<String, Any>>?)

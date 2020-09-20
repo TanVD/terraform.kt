@@ -44,8 +44,10 @@ class TerraformGenerator(
         // TODO: why isn't it specified in schema?
         resourceClassBuilder.addProperty(generateProviderProperty())
 
-        for ((attributeName, attribute) in provider.block.attributes) {
-            generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
+        if (provider.block.attributes != null) {
+            for ((attributeName, attribute) in provider.block.attributes) {
+                generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
+            }
         }
 
         if (provider.block.block_types != null) {
@@ -89,8 +91,11 @@ class TerraformGenerator(
                 .addSuperclassConstructorParameter("id")
                 .addSuperclassConstructorParameter("\"$resourceName\"")
 
-            for ((attributeName, attribute) in resources.getValue(resourceName).block.attributes) {
-                generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
+            val resource = resources.getValue(resourceName)
+            if (resource.block.attributes != null) {
+                for ((attributeName, attribute) in resource.block.attributes) {
+                    generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
+                }
             }
 
             val file = generationPath.resolve(packageNameProvider.getClassFilePath(resourceType, className))
@@ -155,7 +160,7 @@ class TerraformGenerator(
     private fun generateProviderProperty(): PropertySpec {
         val type = Type.STRING
         val propertyBuilder = PropertySpec
-            .builder("provider", type.typeName)
+            .builder("version", type.typeName)
             .delegate(typeToDelegate(type, false))
             .mutable(true)
 
