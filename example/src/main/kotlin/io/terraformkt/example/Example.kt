@@ -1,20 +1,21 @@
 package io.terraformkt.example
 
-import io.terraformkt.aws.resource.lambda.lambda_function
-import io.terraformkt.runtime.terraform
+import io.terraformkt.local.provider.provider
+import io.terraformkt.local.resource.file.file
+import io.terraformkt.runtime.terraformFiles
+import java.io.File
 
 fun main() {
-    terraform {
+    terraformFiles {
         tf("my_file") {
-            lambda_function("my_lambda_function") {
-                this.description = "My Description"
+            provider {
+                version = "~> 1.4"
+            }
+            file("hello") {
+                content = "Hello, Terraform"
+                filename = "hello.txt"
             }
         }
-        tf("other_file") {
-            lambda_function("other_lambda_function") {
-                this.description = "Other Description"
-            }
-        }
-    }.apply()
+    }.terraformApply(File("build/example/tf/terraform"))
 }
 

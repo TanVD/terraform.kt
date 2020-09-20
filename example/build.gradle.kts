@@ -22,7 +22,7 @@ dependencies {
 
 terraformKt {
     provider {
-        name = "aws"
-        version = "2.70.0"
+        name = "local"
+        version = "~> 1.4"
     }
 }
