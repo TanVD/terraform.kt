@@ -1,9 +1,10 @@
 package io.terraformkt.runtime
 
 import io.terraformkt.terraform.TFFile
+import io.terraformkt.wrapper.TerraformWrapper
 import java.io.File
 
-class Terraform {
+class TerraformFiles {
     private val terraformFiles = mutableListOf<TFFile>()
 
     fun addFiles(vararg tfFiles: TFFile) {
@@ -16,9 +17,9 @@ class Terraform {
         terraformFiles.forEach { file -> file.writeToDirectory(directory) }
     }
 
-    fun apply() {
-
+    fun terraformApply(terraformExecutable: File) {
+        TerraformWrapper.applyTerraform(terraformFiles, terraformExecutable, File(terraformExecutable.parentFile, "tfFiles"))
     }
 }
 
-fun terraform(configure: Terraform.() -> Unit) = Terraform().apply(configure)
+fun terraformFiles(configure: TerraformFiles.() -> Unit) = TerraformFiles().apply(configure)

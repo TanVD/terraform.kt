@@ -27,6 +27,7 @@ object TerraformWrapper {
     }
 
     fun applyTerraform(tfFiles: List<TFFile>, terraformExecutable: File, directoryToWriteFiles: File) {
+        directoryToWriteFiles.mkdirs()
         tfFiles.forEach { file -> file.writeToDirectory(directoryToWriteFiles) }
         CommandLine.executeOrFail(
             terraformExecutable.absolutePath,
