@@ -2,11 +2,11 @@ package io.terraformkt.example
 
 import io.terraformkt.local.provider.provider
 import io.terraformkt.local.resource.file.file
-import io.terraformkt.runtime.terraformFiles
+import io.terraformkt.runtime.terraform
 import java.io.File
 
 fun main() {
-    terraformFiles {
+    terraform {
         tf("my_file") {
             provider {
                 version = "~> 1.4"
@@ -16,6 +16,6 @@ fun main() {
                 filename = "hello.txt"
             }
         }
-    }.terraformApply(File("build/localProvider/tf/terraform"))
+    }.apply(File("build/localProvider/tf/terraform"))
 }
 

@@ -28,14 +28,29 @@ object TerraformWrapper {
         )
     }
 
-    fun applyTerraform(tfFiles: List<TFFile>, terraformExecutable: File, directoryToWriteFiles: File) {
-        directoryToWriteFiles.mkdirs()
-        tfFiles.forEach { file -> file.writeToDirectory(directoryToWriteFiles) }
+    fun terraformApply(tfFiles: List<TFFile>, terraformExecutable: File, directoryToWriteFiles: File) {
+        terraformGenerate(tfFiles, directoryToWriteFiles)
         CommandLine.executeOrFail(
             terraformExecutable.absolutePath,
             listOf("apply", "-auto-approve", directoryToWriteFiles.absolutePath),
-            terraformExecutable.parentFile
+            terraformExecutable.parentFile,
+            redirectStdout = true
         )
+    }
+
+    fun terraformPlan(tfFiles: List<TFFile>, terraformExecutable: File, directoryToWriteFiles: File) {
+        terraformGenerate(tfFiles, directoryToWriteFiles)
+        CommandLine.executeOrFail(
+            terraformExecutable.absolutePath,
+            listOf("plan", directoryToWriteFiles.absolutePath),
+            terraformExecutable.parentFile,
+            redirectStdout = true
+        )
+    }
+
+    fun terraformGenerate(tfFiles: List<TFFile>, directoryToWriteFiles: File) {
+        directoryToWriteFiles.mkdirs()
+        tfFiles.forEach { file -> file.writeToDirectory(directoryToWriteFiles) }
     }
 
     fun createConfigFile(downloadPath: File, terraformProvider: String, schemaVersion: String) {
