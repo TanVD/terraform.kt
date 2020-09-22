@@ -3,7 +3,6 @@ package io.terraformkt.example
 import io.terraformkt.aws.provider.provider
 import io.terraformkt.aws.resource.instance.instance
 import io.terraformkt.runtime.terraform
-import java.io.File
 
 fun main() {
     terraform {
@@ -17,6 +16,6 @@ fun main() {
                 instance_type = "t2.micro"
             }
         }
-    }.plan(File("build/AWSProvider/tf/terraform"))
+    }.plan()
 }
 

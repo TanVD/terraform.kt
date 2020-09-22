@@ -11,10 +11,15 @@ import java.net.URL
 
 object TerraformWrapper {
     fun downloadTerraform(downloadPath: File, version: String) {
+        val terraformFile = downloadPath.resolve("terraform")
+        if (terraformFile.exists()) {
+            return
+        }
+
         Downloads.download(URL("https://releases.hashicorp.com/terraform/$version/terraform_${version}_$os.zip"), downloadPath, Archive.ZIP)
 
         if (Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_UNIX)) {
-            CommandLine.execute("chmod", listOf("+x", downloadPath.resolve("terraform").absolutePath), downloadPath, false)
+            CommandLine.execute("chmod", listOf("+x", terraformFile.absolutePath), downloadPath, false)
         }
     }
 
@@ -32,6 +37,13 @@ object TerraformWrapper {
         terraformGenerate(tfFiles, directoryToWriteFiles)
         CommandLine.executeOrFail(
             terraformExecutable.absolutePath,
+            listOf("init", directoryToWriteFiles.absolutePath),
+            terraformExecutable.parentFile,
+            redirectStdout = true,
+            redirectErr = true
+        )
+        CommandLine.executeOrFail(
+            terraformExecutable.absolutePath,
             listOf("apply", "-auto-approve", directoryToWriteFiles.absolutePath),
             terraformExecutable.parentFile,
             redirectStdout = true
@@ -40,6 +52,13 @@ object TerraformWrapper {
 
     fun terraformPlan(tfFiles: List<TFFile>, terraformExecutable: File, directoryToWriteFiles: File) {
         terraformGenerate(tfFiles, directoryToWriteFiles)
+        CommandLine.executeOrFail(
+            terraformExecutable.absolutePath,
+            listOf("init", directoryToWriteFiles.absolutePath),
+            terraformExecutable.parentFile,
+            redirectStdout = true,
+            redirectErr = true
+        )
         CommandLine.executeOrFail(
             terraformExecutable.absolutePath,
             listOf("plan", directoryToWriteFiles.absolutePath),
