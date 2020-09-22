@@ -6,4 +6,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-include("localProvider")
+include("AWSProvider")
