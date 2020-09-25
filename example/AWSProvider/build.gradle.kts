@@ -16,6 +16,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+
+    implementation("io.terraformkt:runtime:0.1.0")
 }
 
 terraformKt {

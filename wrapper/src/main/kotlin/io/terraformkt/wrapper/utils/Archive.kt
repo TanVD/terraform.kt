@@ -1,4 +1,4 @@
-package io.terraformkt.utils
+package io.terraformkt.wrapper.utils
 
 import org.codehaus.plexus.archiver.AbstractUnArchiver
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver

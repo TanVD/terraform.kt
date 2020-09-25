@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.terraform.TFData
 import io.terraformkt.terraform.TFFile
+import io.terraformkt.terraform.TFProvider
 import io.terraformkt.terraform.TFResource
 import io.terraformkt.utils.Json
 import io.terraformkt.utils.NamesUtils
@@ -13,19 +14,65 @@ import java.io.File
 
 class TerraformGenerator(
     private val pathToSchema: File, private val generationPath: File,
-    private val provider: String
+    private val providerName: String
 ) {
-    private val packageNameProvider = NamesUtils(provider)
+    private val packageNameProvider = NamesUtils(providerName)
 
     fun generate() {
         val jsonString = pathToSchema.readText()
         val schema = Json.parse<Schema>(jsonString)
 
-        val resources = schema.provider_schemas.values.single().resource_schemas
-        val data = schema.provider_schemas.values.single().data_source_schemas
+        val schemas = schema.provider_schemas.values.single()
+        val provider = schemas.provider
+        val resources = schemas.resource_schemas
+        val data = schemas.data_source_schemas
 
+        generateProvider(provider)
         generateFiles(resources, ResourceType.RESOURCE)
         generateFiles(data, ResourceType.DATA)
+    }
+
+    private fun generateProvider(provider: Configuration) {
+        val className = "Provider"
+
+        val fileBuilder = FileSpec.builder(packageNameProvider.getProviderPackageName(), className)
+        val resourceClassBuilder = TypeSpec.classBuilder(className)
+            .addProviderKDoc()
+            .addSuperClass(ResourceType.PROVIDER)
+            .addSuperclassConstructorParameter("\"$providerName\"")
+
+        // TODO: why isn't it specified in schema?
+        resourceClassBuilder.addProperty(generateProviderProperty())
+
+        if (provider.block.attributes != null) {
+            for ((attributeName, attribute) in provider.block.attributes) {
+                generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
+            }
+        }
+
+        if (provider.block.block_types != null) {
+            for ((blockTypeName, blockType) in provider.block.block_types) {
+                if (blockType.nesting_mode == "map") {
+                    // TODO support map
+                    continue
+                }
+                if (blockType.block.attributes == null) {
+                    // TODO support other cases
+                    continue
+                }
+                resourceClassBuilder.addType(generateBlockTypeClass(blockTypeName, blockType))
+                resourceClassBuilder.addBlockTypeFunction(blockTypeName)
+            }
+        }
+
+        val file = generationPath.resolve(packageNameProvider.getProviderFilePath())
+        file.parentFile.mkdirs()
+        file.createNewFile()
+
+        fileBuilder
+            .addType(resourceClassBuilder.build())
+            .addClosureFunctionsToProvider("provider", className)
+        file.writeText(fileBuilder.build().toString())
     }
 
     private fun generateFiles(resources: Map<String, Configuration>, resourceType: ResourceType) {
@@ -44,26 +91,12 @@ class TerraformGenerator(
                 .addSuperclassConstructorParameter("id")
                 .addSuperclassConstructorParameter("\"$resourceName\"")
 
-            for ((attrName, attr) in resources.getValue(resourceName).block.attributes) {
-                val type = getType(attr)
-
-                // TODO support all types
-                if (type == Type.ANY) {
-                    continue
+            val resource = resources.getValue(resourceName)
+            if (resource.block.attributes != null) {
+                for ((attributeName, attribute) in resource.block.attributes) {
+                    generateProperty(attributeName, attribute)?.let { resourceClassBuilder.addProperty(it) }
                 }
-                val isComputed = attr["computed"] as? Boolean ?: false
-
-                val propertyBuilder = PropertySpec
-                    .builder(attrName, type.typeName)
-                    .delegate(typeToDelegate(type, isComputed))
-                    .mutable(!isComputed)
-                if (attr.containsKey("description")) {
-                    propertyBuilder.addKdoc(attr["description"] as String)
-                }
-
-                resourceClassBuilder.addProperty(propertyBuilder.build())
             }
-
 
             val file = generationPath.resolve(packageNameProvider.getClassFilePath(resourceType, className))
             file.parentFile.mkdirs()
@@ -74,6 +107,64 @@ class TerraformGenerator(
                 .addClosureFunctions(removeProviderPrefix(resourceName), className)
             file.writeText(fileBuilder.build().toString())
         }
+    }
+
+    private fun generateBlockTypeClass(blockTypeName: String, blockType: BlockType): TypeSpec {
+        val blockTypeClassName = snakeToCamelCase(blockTypeName)
+        val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
+            .superclass(HCLEntity.Inner::class)
+            .addSuperclassConstructorParameter("\"$blockTypeName\"")
+
+        for ((attributeName, attribute) in blockType.block.attributes!!) {
+            generateProperty(attributeName, attribute)?.let { blockTypeClassBuilder.addProperty(it) }
+        }
+
+        return blockTypeClassBuilder.build()
+    }
+
+    private fun TypeSpec.Builder.addBlockTypeFunction(blockTypeName: String): TypeSpec.Builder {
+        val blockTypeClassName = snakeToCamelCase(blockTypeName)
+        return this.addFunction(
+            FunSpec.builder(blockTypeClassName.decapitalize())
+                .addParameter(
+                    "configure", LambdaTypeName.get(
+                        returnType = UNIT,
+                        receiver = TypeVariableName(blockTypeClassName)
+                    )
+                )
+                .addStatement("inner(%N().apply(configure))", blockTypeClassName)
+                .build()
+        )
+    }
+
+    private fun generateProperty(attributeName: String, attribute: Map<String, Any>): PropertySpec? {
+        val type = getType(attribute)
+
+        // TODO support all types
+        if (type == Type.ANY) {
+            return null
+        }
+        val isComputed = attribute["computed"] as? Boolean ?: false
+
+        val propertyBuilder = PropertySpec
+            .builder(attributeName, type.typeName)
+            .delegate(typeToDelegate(type, isComputed))
+            .mutable(!isComputed)
+        if (attribute.containsKey("description")) {
+            propertyBuilder.addKdoc(attribute["description"] as String)
+        }
+
+        return propertyBuilder.build()
+    }
+
+    private fun generateProviderProperty(): PropertySpec {
+        val type = Type.STRING
+        val propertyBuilder = PropertySpec
+            .builder("version", type.typeName)
+            .delegate(typeToDelegate(type, false))
+            .mutable(true)
+
+        return propertyBuilder.build()
     }
 
     private fun getType(attr: Map<String, Any>): Type {
@@ -91,7 +182,7 @@ class TerraformGenerator(
 
         if (attr["type"] is ArrayList<*>) {
             val typeMap = attr["type"] as ArrayList<*>
-            if (typeMap[0] == "list" && typeMap[1] is String) {
+            if ((typeMap[0] == "list" || typeMap[0] == "set") && typeMap[1] is String) {
                 when (typeMap[1]) {
                     "string" -> return Type.STRING_LIST
                     "number" -> return Type.NUMBER_LIST
@@ -100,7 +191,7 @@ class TerraformGenerator(
             }
         }
 
-        // TODO support map, set and list of objects
+        // TODO support map
         return Type.ANY
     }
 
@@ -120,6 +211,9 @@ class TerraformGenerator(
             ResourceType.DATA -> {
                 this.superclass(TFData::class)
             }
+            ResourceType.PROVIDER -> {
+                this.superclass(TFProvider::class)
+            }
         }
     }
 
@@ -127,7 +221,16 @@ class TerraformGenerator(
         return this.addKdoc(
             """Terraform $resourceName resource.
             | 
-            | @see <a href="https://www.terraform.io/docs/providers/$provider/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+            | @see <a href="https://www.terraform.io/docs/providers/$providerName/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+        """.trimMargin()
+        )
+    }
+
+    private fun TypeSpec.Builder.addProviderKDoc(): TypeSpec.Builder {
+        return this.addKdoc(
+            """$providerName Terraform provider.
+            | 
+            | @see <a href="https://www.terraform.io/docs/providers/$providerName/index.html">$providerName provider</a>
         """.trimMargin()
         )
     }
@@ -160,9 +263,36 @@ class TerraformGenerator(
         )
     }
 
+    private fun FileSpec.Builder.addClosureFunctionsToProvider(functionName: String, className: String): FileSpec.Builder {
+        return this.addFunction(
+            FunSpec.builder(functionName)
+                .addParameter(
+                    "configure", LambdaTypeName.get(
+                        returnType = UNIT,
+                        receiver = TypeVariableName(className)
+                    )
+                )
+                .addStatement("return %N().apply(configure)", className)
+                .returns(TypeVariableName(className))
+                .build()
+        ).addFunction(
+            FunSpec.builder(functionName)
+                .receiver(TFFile::class)
+                .addParameter(
+                    "configure", LambdaTypeName.get(
+                        returnType = UNIT,
+                        receiver = TypeVariableName(className)
+                    )
+                )
+                .addStatement("%N(%N().apply(configure))", TFFile::add.name, className)
+                .build()
+        )
+    }
+
     enum class ResourceType {
         DATA,
-        RESOURCE
+        RESOURCE,
+        PROVIDER
     }
 
     enum class Type(val delegateName: String, val typeName: TypeName) {
