@@ -7,7 +7,7 @@ import java.io.File
 class Terraform(
     private val terraformVersion: String = "0.13.0",
     private val terraformPath: File = File(System.getProperty("user.home")).resolve(".terraform/$terraformVersion/terraform"),
-    private val terraformFilesPath: File = File(System.getProperty("user.dir")).resolve("tfFiles")
+    private val terraformFilesPath: File = File(System.getProperty("user.dir")).resolve("terraform")
 ) {
     init {
         TerraformWrapper.downloadTerraform(terraformPath.parentFile, terraformVersion)

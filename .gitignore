@@ -2,4 +2,4 @@
 build
 .gradle
 example/generated
-tfFiles
+example/**/terraform
