@@ -1,7 +1,6 @@
 package io.terraformkt.examples
 
 import io.terraformkt.aws.data.elb.elb_service_account
-import io.terraformkt.aws.data.iam.iam_policy_document
 import io.terraformkt.aws.provider.provider
 import io.terraformkt.aws.resource.s3.s3_bucket
 import io.terraformkt.aws.resource.s3.s3_bucket_public_access_block
@@ -24,11 +23,6 @@ fun main() {
                 bucket = "aws_s3_bucket.s3_bucket.id"
             }
             elb_service_account("example_elb_service_account") {
-            }
-            iam_policy_document("s") {
-                statement {
-
-                }
             }
         }
     }.plan()

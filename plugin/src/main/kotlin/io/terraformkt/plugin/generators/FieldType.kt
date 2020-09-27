@@ -15,6 +15,7 @@ enum class FieldType(val delegateName: String?, val typeName: TypeName) {
     STRING_LIST(HCLEntity::textList.name, Array<String>::class.asClassName().parameterizedBy(com.squareup.kotlinpoet.STRING)),
     NUMBER_LIST(HCLEntity::intList.name, Array<Int>::class.asClassName().parameterizedBy(INT)),
     BOOL_LIST(HCLEntity::boolList.name, Array<Boolean>::class.asClassName().parameterizedBy(BOOLEAN)),
+    OBJECT_LIST(null, HCLEntity.Inner::class.asClassName()), // TODO don't use null
     STRING_MAP(null, HCLMapField::class.asClassName().parameterizedBy(com.squareup.kotlinpoet.STRING)),
     NUMBER_MAP(null, HCLMapField::class.asClassName().parameterizedBy(INT)),
     BOOL_MAP(null, HCLMapField::class.asClassName().parameterizedBy(BOOLEAN)),
@@ -42,8 +43,12 @@ internal fun getType(attr: Map<String, Any>): FieldType {
                 "number" -> return FieldType.NUMBER_LIST
                 "bool" -> return FieldType.BOOL_LIST
             }
-
         }
+
+        if (typeMap[1] is ArrayList<*> && (typeMap[1] as ArrayList<*>)[0] == "object") {
+            return FieldType.OBJECT_LIST
+        }
+
         if ((typeMap[0] == "map") && typeMap[1] is String) {
             when (typeMap[1]) {
                 "string" -> return FieldType.STRING_MAP
@@ -51,6 +56,43 @@ internal fun getType(attr: Map<String, Any>): FieldType {
                 "bool" -> return FieldType.BOOL_MAP
             }
         }
+    }
+
+    // TODO support collections of objects.
+    return FieldType.ANY
+}
+
+internal fun getType(attr: Any): FieldType {
+    if (attr is String) {
+        when (attr) {
+            "string" -> return FieldType.STRING
+            "number" -> return FieldType.NUMBER
+            "bool" -> return FieldType.BOOL
+        }
+    }
+
+    if (attr is ArrayList<*>) {
+        val typeMap = attr
+        if ((typeMap[0] == "list" || typeMap[0] == "set") && typeMap[1] is String) {
+            when (typeMap[1]) {
+                "string" -> return FieldType.STRING_LIST
+                "number" -> return FieldType.NUMBER_LIST
+                "bool" -> return FieldType.BOOL_LIST
+            }
+        }
+//
+//        if (typeMap[1] is ArrayList<*> && (typeMap[1] as ArrayList<*>)[0] == "object") {
+//            return FieldType.OBJECT_LIST
+//        }
+//
+//        if ((typeMap[0] == "map") && typeMap[1] is String) {
+//            when (typeMap[1]) {
+//                "string" -> return FieldType.STRING_MAP
+//                "number" -> return FieldType.NUMBER_MAP
+//                "bool" -> return FieldType.BOOL_MAP
+//            }
+//        }
+//    }
     }
 
     // TODO support collections of objects.
