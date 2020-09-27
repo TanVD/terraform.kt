@@ -7,9 +7,9 @@ import io.terraformkt.aws.resource.key.key_pair
 import io.terraformkt.aws.resource.security.security_group
 import io.terraformkt.runtime.terraform
 
-fun main() {
+fun securityGroup() {
     terraform {
-        tf("instance") {
+        tf("security_group") {
             provider {
                 region = "us-east-2"
                 profile = "default"
@@ -61,5 +61,5 @@ fun main() {
             eip("ubuntu") {
             }
         }
-    }.plan()
+    }.generate()
 }

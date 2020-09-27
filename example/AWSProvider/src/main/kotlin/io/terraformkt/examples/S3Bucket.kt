@@ -6,7 +6,7 @@ import io.terraformkt.aws.resource.s3.s3_bucket
 import io.terraformkt.aws.resource.s3.s3_bucket_public_access_block
 import io.terraformkt.runtime.terraform
 
-fun main() {
+fun s3Bucket() {
     terraform {
         tf("s3_bucket") {
             provider {
@@ -25,5 +25,5 @@ fun main() {
             elb_service_account("example_elb_service_account") {
             }
         }
-    }.plan()
+    }.generate()
 }
