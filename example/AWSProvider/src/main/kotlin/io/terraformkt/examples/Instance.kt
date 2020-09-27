@@ -1,4 +1,4 @@
-package io.terraformkt.example
+package io.terraformkt.examples
 
 import io.terraformkt.aws.provider.provider
 import io.terraformkt.aws.resource.instance.instance
@@ -6,7 +6,7 @@ import io.terraformkt.runtime.terraform
 
 fun main() {
     terraform {
-        tf("my_file") {
+        tf("instance") {
             provider {
                 region = "us-east-2"
                 profile = "default"
@@ -18,4 +18,3 @@ fun main() {
         }
     }.plan()
 }
-

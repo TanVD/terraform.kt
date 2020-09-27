@@ -53,6 +53,9 @@ class TerraformGenerator(
                     resourceClassBuilder.addAttribute(attributeName, attribute)
                 }
             }
+            if (resource.block.block_types != null) {
+                generateBlockTypes(resource.block.block_types, resourceClassBuilder)
+            }
 
             fileBuilder
                 .addType(resourceClassBuilder.build())

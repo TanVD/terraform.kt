@@ -2,10 +2,17 @@ package io.terraformkt.plugin.generators
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import io.terraformkt.BlockType
+import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.utils.Text
 
 internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map<String, Any>) {
     val type = getType(attribute)
+
+    // TODO support collection of objects
+    if (type == FieldType.ANY) {
+        return
+    }
 
     val isComputed = attribute["computed"] as? Boolean ?: false
 
@@ -13,7 +20,7 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
     if (type.delegateName == null) {
         this.addType(generateMapAttribute(attributeName, type.typeName))
         this.addFunction(
-            generateMapClosureFunction(Text.snakeToCamelCase(attributeName))
+            generateMapClosureFunction(Text.snakeToCamelCase(attributeName), type.typeName)
         )
         return
     }
@@ -33,7 +40,13 @@ private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
     val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
         .primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter("map", Map::class.asClassName().parameterizedBy(STRING, STRING))
+                .addParameter(
+                    "map", Map::class.asClassName()
+                        .parameterizedBy(
+                            STRING, (typeName as ParameterizedTypeName)
+                                .typeArguments.first()
+                        )
+                ) // TODO find better way to get type parameter
                 .build()
         )
         .superclass(typeName)
@@ -43,11 +56,57 @@ private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
     return blockTypeClassBuilder.build()
 }
 
-private fun generateMapClosureFunction(className: String): FunSpec {
+private fun generateMapClosureFunction(className: String, typeName: TypeName): FunSpec {
     return FunSpec.builder(className.decapitalize())
         .addParameter(
-            "map", Map::class.asClassName().parameterizedBy(STRING, STRING)
+            "map", Map::class.asClassName().parameterizedBy(
+                STRING, (typeName as ParameterizedTypeName)
+                    .typeArguments.first()
+            )
         )
         .addStatement("inner(%N(map))", className)
         .build()
+}
+
+internal fun generateBlockTypeClass(blockTypeName: String, attributes: Map<String, Map<String, Any>>): TypeSpec {
+    val blockTypeClassName = Text.snakeToCamelCase(blockTypeName)
+    val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
+        .superclass(HCLEntity.Inner::class)
+        .addSuperclassConstructorParameter("\"$blockTypeName\"")
+
+    for ((attributeName, attribute) in attributes) {
+        blockTypeClassBuilder.addAttribute(attributeName, attribute)
+    }
+
+    return blockTypeClassBuilder.build()
+}
+
+internal fun TypeSpec.Builder.addBlockTypeFunction(blockTypeName: String): TypeSpec.Builder {
+    val blockTypeClassName = Text.snakeToCamelCase(blockTypeName)
+    return this.addFunction(
+        FunSpec.builder(blockTypeClassName.decapitalize())
+            .addParameter(
+                "configure", LambdaTypeName.get(
+                    returnType = UNIT,
+                    receiver = TypeVariableName(blockTypeClassName)
+                )
+            )
+            .addStatement("inner(%N().apply(configure))", blockTypeClassName)
+            .build()
+    )
+}
+
+internal fun generateBlockTypes(blockTypes: Map<String, BlockType>, resourceClassBuilder: TypeSpec.Builder) {
+    for ((blockTypeName, blockType) in blockTypes) {
+        if (blockType.nesting_mode == "map") {
+            // TODO support map
+            continue
+        }
+        if (blockType.block.attributes == null) {
+            // TODO support other cases
+            continue
+        }
+        resourceClassBuilder.addType(generateBlockTypeClass(blockTypeName, blockType.block.attributes))
+        resourceClassBuilder.addBlockTypeFunction(blockTypeName)
+    }
 }
