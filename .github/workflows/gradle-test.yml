@@ -27,4 +27,4 @@ jobs:
         with:
           name: test-report
           path: |
-            build/gradle/reports/**/*
+            build/plugin/reports/**/*
