@@ -1,9 +1,9 @@
-name: Gradle Build
+name: Gradle Test
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -16,5 +16,15 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Build with Gradle
-        run: ./gradlew build -x test --console=plain
+      - name: Integration Tests
+        run: |
+          ./gradlew publishToMavenLocal --console=plain
+          ./gradlew test --console=plain
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: test-report
+          path: |
+            build/plugin/reports/**/*

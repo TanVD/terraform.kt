@@ -1,0 +1,26 @@
+package io.terraformkt.plugin.generators
+
+import com.squareup.kotlinpoet.TypeSpec
+import io.terraformkt.terraform.TFData
+import io.terraformkt.terraform.TFProvider
+import io.terraformkt.terraform.TFResource
+
+enum class ResourceType {
+    DATA,
+    RESOURCE,
+    PROVIDER
+}
+
+internal fun TypeSpec.Builder.addSuperClass(resourceType: ResourceType): TypeSpec.Builder {
+    return when (resourceType) {
+        ResourceType.RESOURCE -> {
+            this.superclass(TFResource::class)
+        }
+        ResourceType.DATA -> {
+            this.superclass(TFData::class)
+        }
+        ResourceType.PROVIDER -> {
+            this.superclass(TFProvider::class)
+        }
+    }
+}

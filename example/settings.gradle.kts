@@ -6,4 +6,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-include("AWSProvider")
+include("aws")

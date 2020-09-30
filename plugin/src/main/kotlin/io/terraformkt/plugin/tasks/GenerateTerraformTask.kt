@@ -1,6 +1,6 @@
 package io.terraformkt.plugin.tasks
 
-import io.terraformkt.TerraformGenerator
+import io.terraformkt.plugin.generators.TerraformGenerator
 import io.terraformkt.plugin.terraformKt
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
