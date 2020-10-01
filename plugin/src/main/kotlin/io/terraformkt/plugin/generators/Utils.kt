@@ -67,9 +67,6 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any
         .builder(attributeName, type.typeName)
         .delegate(typeToDelegate(type, isComputed))
         .mutable(!isComputed)
-//    if (attribute.containsKey("description")) {
-//        propertyBuilder.addKdoc(attribute["description"] as String)
-//    }
     this.addProperty(propertyBuilder.build())
 }
 

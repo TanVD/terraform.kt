@@ -58,7 +58,7 @@ internal fun getType(attr: Map<String, Any>): FieldType {
         }
     }
 
-    // TODO support collections of objects.
+    // TODO support map of objects.
     return FieldType.ANY
 }
 
@@ -80,19 +80,6 @@ internal fun getType(attr: Any): FieldType {
                 "bool" -> return FieldType.BOOL_LIST
             }
         }
-//
-//        if (typeMap[1] is ArrayList<*> && (typeMap[1] as ArrayList<*>)[0] == "object") {
-//            return FieldType.OBJECT_LIST
-//        }
-//
-//        if ((typeMap[0] == "map") && typeMap[1] is String) {
-//            when (typeMap[1]) {
-//                "string" -> return FieldType.STRING_MAP
-//                "number" -> return FieldType.NUMBER_MAP
-//                "bool" -> return FieldType.BOOL_MAP
-//            }
-//        }
-//    }
     }
 
     // TODO support collections of objects.
