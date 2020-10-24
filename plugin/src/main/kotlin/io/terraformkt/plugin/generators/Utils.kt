@@ -7,15 +7,14 @@ import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.utils.Text
 
 internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map<String, Any>) {
-    val type = getType(attribute)
+    val type = getFieldType(attribute)
 
     // TODO support map of objects
-    if (type == FieldType.ANY) {
+    if (type == FieldTypeWithoutDelegate.ANY) {
         return
     }
 
-    if (type == FieldType.OBJECT_LIST) {
-        println(attributeName)
+    if (type == FieldTypeWithoutDelegate.OBJECT_LIST) {
         val typeMap = attribute["type"] as ArrayList<*>
         val attributes = (typeMap[1] as ArrayList<*>)[1] as Map<String, Any>
         this.addType(generateObject(attributeName, attributes))
@@ -23,35 +22,36 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
         return
     }
 
-    // It means that attribute has map type
-    if (type.delegateName == null) {
+    // All other FieldTypeWithoutDelegate are maps.
+    if (type is FieldTypeWithoutDelegate) {
         this.addType(generateMapAttribute(attributeName, type.typeName))
         this.addFunction(
             generateMapClosureFunction(Text.snakeToCamelCase(attributeName), type.typeName)
         )
         return
     }
-
-    val propertyBuilder = PropertySpec
-        .builder(attributeName, type.typeName)
-        .delegate(typeToDelegate(type))
-        .mutable()
-    if (attribute.containsKey("description")) {
-        propertyBuilder.addKdoc(attribute["description"] as String)
+    if (type is FieldTypeWithDelegate) {
+        val propertyBuilder = PropertySpec
+            .builder(attributeName, type.typeName)
+            .delegate(typeToDelegate(type))
+            .mutable()
+        if (attribute.containsKey("description")) {
+            propertyBuilder.addKdoc(attribute["description"] as String)
+        }
+        this.addProperty(propertyBuilder.build())
     }
-    this.addProperty(propertyBuilder.build())
 }
 
 internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any) {
-    val type = getType(attribute)
+    val type = getFieldType(attribute)
 
     // TODO support map of objects
-    if (type == FieldType.ANY) {
+    if (type == FieldTypeWithoutDelegate.ANY) {
         return
     }
 
-    // It means that attribute has map type
-    if (type.delegateName == null) {
+    // All other FieldTypeWithoutDelegate are maps.
+    if (type is FieldTypeWithoutDelegate) {
         this.addType(generateMapAttribute(attributeName, type.typeName))
         this.addFunction(
             generateMapClosureFunction(Text.snakeToCamelCase(attributeName), type.typeName)
@@ -59,11 +59,13 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any
         return
     }
 
-    val propertyBuilder = PropertySpec
-        .builder(attributeName, type.typeName)
-        .delegate(typeToDelegate(type))
-        .mutable()
-    this.addProperty(propertyBuilder.build())
+    if (type is FieldTypeWithDelegate) {
+        val propertyBuilder = PropertySpec
+            .builder(attributeName, type.typeName)
+            .delegate(typeToDelegate(type))
+            .mutable()
+        this.addProperty(propertyBuilder.build())
+    }
 }
 
 private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
