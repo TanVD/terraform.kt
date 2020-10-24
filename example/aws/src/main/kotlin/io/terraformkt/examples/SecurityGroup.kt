@@ -14,30 +14,29 @@ fun securityGroup() {
                 region = "us-east-2"
                 profile = "default"
             }
+
+            instance("ubuntu") {
+                ami = "ami-0c55b159cbfafe1f0"
+                instance_type = "t2.micro"
+
+                ebsBlockDevice {
+                    device_name = "/dev/sda1"
+                }
+                vpc_security_group_ids = arrayOf("aws_security_group.ubuntu.id")
+
+                tags(mapOf("Name" to "Ubuntu"))
+            }
+
             key_pair("ubuntu") {
                 public_key = "KEY"
+                key_name = "key_name"
             }
+
             security_group("ubuntu") {
-                description = "Allow HTTP, HTTPS and SSH traffic"
                 ingress {
                     description = "SSH"
                     from_port = 22
                     to_port = 22
-                    protocol = "tcp"
-                    cidr_blocks = arrayOf("0.0.0.0/0")
-                }
-                ingress {
-                    description = "HTTPS"
-                    from_port = 443
-                    to_port = 443
-                    protocol = "tcp"
-                    cidr_blocks = arrayOf("0.0.0.0/0")
-                }
-
-                ingress {
-                    description = "HTTP"
-                    from_port = 80
-                    to_port = 80
                     protocol = "tcp"
                     cidr_blocks = arrayOf("0.0.0.0/0")
                 }
@@ -49,17 +48,6 @@ fun securityGroup() {
                     cidr_blocks = arrayOf("0.0.0.0/0")
                 }
             }
-
-            instance("ubuntu") {
-                ami = "ami-0c55b159cbfafe1f0"
-                instance_type = "t2.micro"
-
-                ebsBlockDevice {
-                    device_name = "/dev/sda1"
-                }
-            }
-            eip("ubuntu") {
-            }
         }
-    }.generate()
+    }.apply()
 }
