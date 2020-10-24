@@ -23,8 +23,6 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
         return
     }
 
-    val isComputed = attribute["computed"] as? Boolean ?: false
-
     // It means that attribute has map type
     if (type.delegateName == null) {
         this.addType(generateMapAttribute(attributeName, type.typeName))
@@ -36,8 +34,8 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
 
     val propertyBuilder = PropertySpec
         .builder(attributeName, type.typeName)
-        .delegate(typeToDelegate(type, isComputed))
-        .mutable(!isComputed)
+        .delegate(typeToDelegate(type))
+        .mutable()
     if (attribute.containsKey("description")) {
         propertyBuilder.addKdoc(attribute["description"] as String)
     }
@@ -52,8 +50,6 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any
         return
     }
 
-    val isComputed = false
-
     // It means that attribute has map type
     if (type.delegateName == null) {
         this.addType(generateMapAttribute(attributeName, type.typeName))
@@ -65,8 +61,8 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any
 
     val propertyBuilder = PropertySpec
         .builder(attributeName, type.typeName)
-        .delegate(typeToDelegate(type, isComputed))
-        .mutable(!isComputed)
+        .delegate(typeToDelegate(type))
+        .mutable()
     this.addProperty(propertyBuilder.build())
 }
 

@@ -86,6 +86,6 @@ internal fun getType(attr: Any): FieldType {
     return FieldType.ANY
 }
 
-fun typeToDelegate(type: FieldType, isComputed: Boolean): String {
-    return type.delegateName + if (isComputed) "(computed = true)" else "()"
+fun typeToDelegate(type: FieldType): String {
+    return type.delegateName + "()"
 }

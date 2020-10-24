@@ -79,7 +79,7 @@ class ProviderGenerator(private val providerName: String, private val packageNam
         val type = FieldType.STRING
         val propertyBuilder = PropertySpec
             .builder("version", type.typeName)
-            .delegate(typeToDelegate(type, false))
+            .delegate(typeToDelegate(type))
             .mutable(true)
 
         return propertyBuilder.build()
