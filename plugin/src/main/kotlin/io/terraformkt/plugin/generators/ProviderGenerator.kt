@@ -76,7 +76,7 @@ class ProviderGenerator(private val providerName: String, private val packageNam
     }
 
     private fun generateVersionProperty(): PropertySpec {
-        val type = FieldType.STRING
+        val type = FieldTypeWithDelegate.STRING
         val propertyBuilder = PropertySpec
             .builder("version", type.typeName)
             .delegate(typeToDelegate(type))
