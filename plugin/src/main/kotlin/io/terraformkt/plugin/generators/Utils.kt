@@ -7,6 +7,14 @@ import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.utils.Text
 
 internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map<String, Any>) {
+    require(attribute.containsKey("type") && attribute["type"] != null) {
+        "No type parameter for the attribute."
+    }
+    val description = attribute["description"] as String?
+    this.addAttribute(attributeName, attribute["type"]!!, description)
+}
+
+internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any, description: String?) {
     val type = getFieldType(attribute)
 
     // TODO support map of objects
@@ -15,9 +23,11 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
     }
 
     if (type == FieldTypeWithoutDelegate.OBJECT_LIST) {
-        val typeMap = attribute["type"] as ArrayList<*>
-        val attributes = (typeMap[1] as ArrayList<*>)[1] as Map<String, Any>
-        this.addType(generateObject(attributeName, attributes))
+        require(attribute is ArrayList<*>) {
+            "Wrong structure of attribute's type."
+        }
+        val objectAttributes = getListObjectAttributes(attribute)
+        this.addType(generateObject(attributeName, objectAttributes))
         this.addBlockTypeFunction(attributeName)
         return
     }
@@ -35,37 +45,23 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
             .builder(attributeName, type.typeName)
             .delegate(typeToDelegate(type))
             .mutable()
-        if (attribute.containsKey("description")) {
-            propertyBuilder.addKdoc(attribute["description"] as String)
+        if (description != null) {
+            propertyBuilder.addKdoc(description)
         }
         this.addProperty(propertyBuilder.build())
     }
 }
 
-internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any) {
-    val type = getFieldType(attribute)
-
-    // TODO support map of objects
-    if (type == FieldTypeWithoutDelegate.ANY) {
-        return
+private fun getListObjectAttributes(type: ArrayList<*>): Map<String, Any> {
+    require(type[1] is ArrayList<*>) {
+        "Wrong type structure for the list object."
     }
+    val objectType = type[1] as ArrayList<*>
 
-    // All other FieldTypeWithoutDelegate are maps.
-    if (type is FieldTypeWithoutDelegate) {
-        this.addType(generateMapAttribute(attributeName, type.typeName))
-        this.addFunction(
-            generateMapClosureFunction(Text.snakeToCamelCase(attributeName), type.typeName)
-        )
-        return
+    require(objectType[1] is Map<*, *>) {
+        "Wrong type structure for the list object."
     }
-
-    if (type is FieldTypeWithDelegate) {
-        val propertyBuilder = PropertySpec
-            .builder(attributeName, type.typeName)
-            .delegate(typeToDelegate(type))
-            .mutable()
-        this.addProperty(propertyBuilder.build())
-    }
+    return objectType[1] as Map<String, Any>
 }
 
 private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
@@ -79,7 +75,7 @@ private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
                             STRING, (typeName as ParameterizedTypeName)
                                 .typeArguments.first()
                         )
-                ) // TODO find better way to get type parameter
+                )
                 .build()
         )
         .superclass(typeName)
@@ -121,7 +117,7 @@ internal fun generateObject(blockTypeName: String, attributes: Map<String, Any>)
         .addSuperclassConstructorParameter("\"$blockTypeName\"")
 
     for ((attributeName, attribute) in attributes) {
-        blockTypeClassBuilder.addAttribute(attributeName, attribute)
+        blockTypeClassBuilder.addAttribute(attributeName, attribute, null)
     }
 
     return blockTypeClassBuilder.build()
