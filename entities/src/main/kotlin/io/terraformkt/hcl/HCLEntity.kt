@@ -104,6 +104,12 @@ open class HCLEntity(
             HCLTextListField(field, entity, value)
         }
     }
+
+    fun anyList(name: String? = null, default: Array<Any>? = null): FieldProvider<Array<Any>, HCLAnyListField> {
+        return FieldProvider(name, default) { field, entity, value ->
+            HCLAnyListField(field, entity, value)
+        }
+    }
 }
 
 val <T : Any> KProperty0<T>.ref: String

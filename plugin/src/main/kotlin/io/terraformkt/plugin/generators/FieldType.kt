@@ -1,10 +1,7 @@
 package io.terraformkt.plugin.generators
 
-import com.squareup.kotlinpoet.BOOLEAN
-import com.squareup.kotlinpoet.INT
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.asClassName
 import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.hcl.HCLMapField
 
@@ -27,6 +24,10 @@ enum class FieldTypeWithDelegate(val delegateName: String, val typeName: TypeNam
     BOOL_LIST(
         HCLEntity::boolList.name, Array<Boolean>::
         class.asClassName().parameterizedBy(BOOLEAN)
+    ),
+    ANY_LIST(
+        HCLEntity::anyList.name, Array<Any>::
+        class.asClassName().parameterizedBy(ANY)
     );
 
     override fun hasDelegate(): Boolean {
@@ -38,20 +39,11 @@ enum class FieldTypeWithoutDelegate(val typeName: TypeName) : FieldType {
     OBJECT_LIST(HCLEntity.Inner::class.asClassName()),
     STRING_MAP(HCLMapField::class.asClassName().parameterizedBy(com.squareup.kotlinpoet.STRING)),
     NUMBER_MAP(HCLMapField::class.asClassName().parameterizedBy(INT)),
-    BOOL_MAP(HCLMapField::class.asClassName().parameterizedBy(BOOLEAN)),
-    ANY(com.squareup.kotlinpoet.ANY);
+    BOOL_MAP(HCLMapField::class.asClassName().parameterizedBy(BOOLEAN));
 
     override fun hasDelegate(): Boolean {
         return false
     }
-}
-
-internal fun getFieldType(attr: Map<String, Any>): FieldType {
-    require(attr.containsKey("type")) {
-        "No type parameter for the attribute."
-    }
-
-    return getFieldType(attr["type"]!!)
 }
 
 internal fun getFieldType(type: Any): FieldType {
@@ -73,8 +65,12 @@ internal fun getFieldType(type: Any): FieldType {
                 }
             }
 
-            if (type[1] is ArrayList<*> && (type[1] as ArrayList<*>)[0] == "object") {
-                return FieldTypeWithoutDelegate.OBJECT_LIST
+            if (type[1] is ArrayList<*>) {
+                return if ((type[1] as ArrayList<*>)[0] == "object") {
+                    FieldTypeWithoutDelegate.OBJECT_LIST
+                } else {
+                    FieldTypeWithDelegate.ANY_LIST
+                }
             }
         }
 
@@ -85,10 +81,14 @@ internal fun getFieldType(type: Any): FieldType {
                 "bool" -> return FieldTypeWithoutDelegate.BOOL_MAP
             }
         }
+
+        // Map of object is not used in AWS, Azure and GCP.
+        if ((type[0] == "map")) {
+            error("Map of object encountered")
+        }
     }
 
-    // TODO support map of objects.
-    return FieldTypeWithoutDelegate.ANY
+    error("Unsupported type. $type")
 }
 
 fun typeToDelegate(type: FieldTypeWithDelegate): String {

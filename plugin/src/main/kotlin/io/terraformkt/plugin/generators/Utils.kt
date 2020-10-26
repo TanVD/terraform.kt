@@ -17,11 +17,6 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map
 internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any, description: String?) {
     val type = getFieldType(attribute)
 
-    // TODO support map of objects
-    if (type == FieldTypeWithoutDelegate.ANY) {
-        return
-    }
-
     if (type == FieldTypeWithoutDelegate.OBJECT_LIST) {
         require(attribute is ArrayList<*>) {
             "Wrong structure of attribute's type."

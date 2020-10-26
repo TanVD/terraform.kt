@@ -77,3 +77,25 @@ class HCLIntListField(name: String, owner: HCLEntity, value: Array<Int>?) : HCLF
         return "$hcl_name = ${value!!.sortedArray().joinToString(prefix = "[", postfix = "]") { "$it" }}"
     }
 }
+
+/** Field with any list owned by HCL entity */
+class HCLAnyListField(name: String, owner: HCLEntity, value: Array<Any>?) : HCLField<Array<Any>>(name, owner, value) {
+    override fun render(): String {
+        return "$hcl_name = ${
+        value!!.joinToString(prefix = "[", postfix = "]") {
+            anyToText(it)
+        }
+        }"
+    }
+}
+
+// Suppose any can be int, string, bool and map.
+private fun anyToText(any: Any): String {
+    if (any is String) {
+        return HCLTextField.toText(any)
+    }
+    if (any is Map<*, *>) {
+        return "{${HCLMapField.renderMap(any as Map<String, Any>)}}"
+    }
+    return "$any"
+}

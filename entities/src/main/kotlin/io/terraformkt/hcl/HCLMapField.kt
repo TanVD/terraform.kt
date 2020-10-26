@@ -6,8 +6,14 @@ open class HCLMapField<T>(name: String, private val map: Map<String, T>) : HCLEn
     override fun render(): String {
         return """
             |${tf_name} {
-            |${map.entries.joinToString(separator = "\n") { (key, value) -> "$key = \"$value\"" }.withIndent()}
+            |${renderMap(map)}
             |}
             """.trimMargin()
+    }
+
+    companion object {
+        fun renderMap(map: Map<String, *>): String {
+            return map.entries.joinToString(separator = "\n") { (key, value) -> "$key = \"$value\"" }.withIndent()
+        }
     }
 }
