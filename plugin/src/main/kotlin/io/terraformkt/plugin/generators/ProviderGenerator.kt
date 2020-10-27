@@ -27,7 +27,7 @@ class ProviderGenerator(private val providerName: String, private val packageNam
         }
 
         if (provider.block.block_types != null) {
-            generateBlockTypes(provider.block.block_types, resourceClassBuilder)
+            resourceClassBuilder.generateBlockTypes(provider.block.block_types)
         }
 
         val file = generationPath.resolve(packageNameProvider.getProviderFilePath())
@@ -85,5 +85,3 @@ class ProviderGenerator(private val providerName: String, private val packageNam
         return propertyBuilder.build()
     }
 }
-
-

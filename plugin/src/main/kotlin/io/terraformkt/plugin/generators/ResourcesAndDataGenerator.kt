@@ -35,7 +35,7 @@ class ResourcesAndDataGenerator(
                 }
             }
             if (resource.block.block_types != null) {
-                generateBlockTypes(resource.block.block_types, resourceClassBuilder)
+                resourceClassBuilder.generateBlockTypes(resource.block.block_types)
             }
 
             fileBuilder
