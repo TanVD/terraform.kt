@@ -42,7 +42,11 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any
             .delegate(typeToDelegate(type))
             .mutable()
         if (description != null) {
-            propertyBuilder.addKdoc(description)
+            try {
+                propertyBuilder.addKdoc(description)
+            } catch (e: Exception) {
+                // TODO escape %
+            }
         }
         this.addProperty(propertyBuilder.build())
     }
@@ -142,8 +146,8 @@ internal fun TypeSpec.Builder.addBlockTypeFunction(blockTypeName: String): TypeS
 internal fun TypeSpec.Builder.generateBlockTypes(blockTypes: Map<String, BlockType>) {
     for ((blockTypeName, blockType) in blockTypes) {
         if (blockType.nesting_mode == "map") {
-            // TODO support map
-            continue
+            // Map nesting mode is not used in AWS, Azure and GCP.
+            throw IllegalStateException("Map nesting mode is not supported.")
         }
 
         this.addType(generateBlockTypeClass(blockTypeName, blockType.block))
