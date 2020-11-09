@@ -13,7 +13,7 @@ class Terraform(
         TerraformWrapper.downloadTerraform(terraformPath.parentFile, terraformVersion)
     }
 
-    private val terraformFiles = mutableListOf<TFFile>()
+    private val terraformFiles = ArrayList<TFFile>()
 
     fun addFiles(vararg tfFiles: TFFile) {
         terraformFiles.addAll(tfFiles.asIterable())

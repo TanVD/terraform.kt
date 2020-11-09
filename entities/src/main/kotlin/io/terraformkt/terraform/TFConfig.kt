@@ -56,7 +56,7 @@ class TFConfig : HCLEntity.Named() {
             }
         }
 
-        class Azurerm : Backend("azurerm") {
+        class AzureRM : Backend("azurerm") {
             var storage_account_name by text()
             var container_name by text()
             var key by text()
