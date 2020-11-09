@@ -5,10 +5,11 @@ import io.terraformkt.terraform.TFData
 import io.terraformkt.terraform.TFProvider
 import io.terraformkt.terraform.TFResource
 
-enum class ResourceType {
-    DATA,
-    RESOURCE,
-    PROVIDER
+enum class ResourceType(val firstLetter: Char) {
+    DATA('d'),
+    RESOURCE('r'),
+    PROVIDER('p'),
+
 }
 
 internal fun TypeSpec.Builder.addSuperClass(resourceType: ResourceType): TypeSpec.Builder {

@@ -23,7 +23,7 @@ class ResourcesAndDataGenerator(
                         .addParameter("id", String::class)
                         .build()
                 )
-                .addClassKDoc(resourceName)
+                .addClassKDoc(resourceName, resourceType)
                 .addSuperClass(resourceType)
                 .addSuperclassConstructorParameter("id")
                 .addSuperclassConstructorParameter("\"$resourceName\"")
@@ -35,7 +35,7 @@ class ResourcesAndDataGenerator(
                 }
             }
             if (resource.block.block_types != null) {
-                generateBlockTypes(resource.block.block_types, resourceClassBuilder)
+                resourceClassBuilder.generateBlockTypes(resource.block.block_types)
             }
 
             fileBuilder
@@ -53,11 +53,11 @@ class ResourcesAndDataGenerator(
         return resourceName.substringAfter("_")
     }
 
-    private fun TypeSpec.Builder.addClassKDoc(resourceName: String): TypeSpec.Builder {
+    private fun TypeSpec.Builder.addClassKDoc(resourceName: String, resourceType: ResourceType): TypeSpec.Builder {
         return this.addKdoc(
             """Terraform $resourceName resource.
             | 
-            | @see <a href="https://www.terraform.io/docs/providers/$providerName/r/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
+            | @see <a href="https://www.terraform.io/docs/providers/$providerName/${resourceType.firstLetter}/${removeProviderPrefix(resourceName)}.html">$resourceName</a>
         """.trimMargin()
         )
     }

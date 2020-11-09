@@ -27,7 +27,7 @@ class ProviderGenerator(private val providerName: String, private val packageNam
         }
 
         if (provider.block.block_types != null) {
-            generateBlockTypes(provider.block.block_types, resourceClassBuilder)
+            resourceClassBuilder.generateBlockTypes(provider.block.block_types)
         }
 
         val file = generationPath.resolve(packageNameProvider.getProviderFilePath())
@@ -76,14 +76,12 @@ class ProviderGenerator(private val providerName: String, private val packageNam
     }
 
     private fun generateVersionProperty(): PropertySpec {
-        val type = FieldType.STRING
+        val type = FieldTypeWithDelegate.STRING
         val propertyBuilder = PropertySpec
             .builder("version", type.typeName)
-            .delegate(typeToDelegate(type, false))
+            .delegate(typeToDelegate(type))
             .mutable(true)
 
         return propertyBuilder.build()
     }
 }
-
-

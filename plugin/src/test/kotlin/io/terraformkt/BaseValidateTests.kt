@@ -13,7 +13,7 @@ abstract class BaseValidateTests(private val provider: String) {
 
     /** Get actual generated file */
     protected fun actual(file: String): String {
-        return File(projectDir, "$provider/terraform/$file.tf").readText()
+        return File(projectDir, "/$provider/terraform/$file.tf").readText()
     }
 
     /** Get expected content of Terraform file */

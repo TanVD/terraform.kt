@@ -3,71 +3,65 @@ package io.terraformkt.plugin.generators
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import io.terraformkt.BlockType
+import io.terraformkt.ConfigurationBlock
 import io.terraformkt.hcl.HCLEntity
 import io.terraformkt.utils.Text
 
 internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Map<String, Any>) {
-    val type = getType(attribute)
-
-    // TODO support map of objects
-    if (type == FieldType.ANY) {
-        return
+    require(attribute.containsKey("type") && attribute["type"] != null) {
+        "No type parameter for the attribute."
     }
+    val description = attribute["description"] as String?
+    this.addAttribute(attributeName, attribute["type"]!!, description)
+}
 
-    if (type == FieldType.OBJECT_LIST) {
-        println(attributeName)
-        val typeMap = attribute["type"] as ArrayList<*>
-        val attributes = (typeMap[1] as ArrayList<*>)[1] as Map<String, Any>
-        this.addType(generateObject(attributeName, attributes))
+internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any, description: String?) {
+    val type = getFieldType(attribute)
+
+    if (type == FieldTypeWithoutDelegate.OBJECT_LIST) {
+        require(attribute is ArrayList<*>) {
+            "Wrong structure of attribute's type."
+        }
+        val objectAttributes = getListObjectAttributes(attribute)
+        this.addType(generateObject(attributeName, objectAttributes))
         this.addBlockTypeFunction(attributeName)
         return
     }
 
-    val isComputed = attribute["computed"] as? Boolean ?: false
-
-    // It means that attribute has map type
-    if (type.delegateName == null) {
+    // All other FieldTypeWithoutDelegate are maps.
+    if (type is FieldTypeWithoutDelegate) {
         this.addType(generateMapAttribute(attributeName, type.typeName))
         this.addFunction(
             generateMapClosureFunction(Text.snakeToCamelCase(attributeName), type.typeName)
         )
         return
     }
-
-    val propertyBuilder = PropertySpec
-        .builder(attributeName, type.typeName)
-        .delegate(typeToDelegate(type, isComputed))
-        .mutable(!isComputed)
-    if (attribute.containsKey("description")) {
-        propertyBuilder.addKdoc(attribute["description"] as String)
+    if (type is FieldTypeWithDelegate) {
+        val propertyBuilder = PropertySpec
+            .builder(attributeName, type.typeName)
+            .delegate(typeToDelegate(type))
+            .mutable()
+        if (description != null) {
+            try {
+                propertyBuilder.addKdoc(description)
+            } catch (e: Exception) {
+                // TODO escape %
+            }
+        }
+        this.addProperty(propertyBuilder.build())
     }
-    this.addProperty(propertyBuilder.build())
 }
 
-internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any) {
-    val type = getType(attribute)
-
-    // TODO support map of objects
-    if (type == FieldType.ANY) {
-        return
+private fun getListObjectAttributes(type: ArrayList<*>): Map<String, Any> {
+    require(type[1] is ArrayList<*>) {
+        "Wrong type structure for the list object."
     }
+    val objectType = type[1] as ArrayList<*>
 
-    val isComputed = false
-
-    // It means that attribute has map type
-    if (type.delegateName == null) {
-        this.addType(generateMapAttribute(attributeName, type.typeName))
-        this.addFunction(
-            generateMapClosureFunction(Text.snakeToCamelCase(attributeName), type.typeName)
-        )
-        return
+    require(objectType[1] is Map<*, *>) {
+        "Wrong type structure for the list object."
     }
-
-    val propertyBuilder = PropertySpec
-        .builder(attributeName, type.typeName)
-        .delegate(typeToDelegate(type, isComputed))
-        .mutable(!isComputed)
-    this.addProperty(propertyBuilder.build())
+    return objectType[1] as Map<String, Any>
 }
 
 private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
@@ -81,7 +75,7 @@ private fun generateMapAttribute(name: String, typeName: TypeName): TypeSpec {
                             STRING, (typeName as ParameterizedTypeName)
                                 .typeArguments.first()
                         )
-                ) // TODO find better way to get type parameter
+                )
                 .build()
         )
         .superclass(typeName)
@@ -103,14 +97,19 @@ private fun generateMapClosureFunction(className: String, typeName: TypeName): F
         .build()
 }
 
-internal fun generateBlockTypeClass(blockTypeName: String, attributes: Map<String, Map<String, Any>>): TypeSpec {
+internal fun generateBlockTypeClass(blockTypeName: String, block: ConfigurationBlock): TypeSpec {
     val blockTypeClassName = Text.snakeToCamelCase(blockTypeName)
     val blockTypeClassBuilder = TypeSpec.classBuilder(blockTypeClassName)
         .superclass(HCLEntity.Inner::class)
         .addSuperclassConstructorParameter("\"$blockTypeName\"")
 
-    for ((attributeName, attribute) in attributes) {
-        blockTypeClassBuilder.addAttribute(attributeName, attribute)
+    if (block.attributes != null) {
+        for ((attributeName, attribute) in block.attributes) {
+            blockTypeClassBuilder.addAttribute(attributeName, attribute)
+        }
+    }
+    if (block.block_types != null) {
+        blockTypeClassBuilder.generateBlockTypes(block.block_types)
     }
 
     return blockTypeClassBuilder.build()
@@ -123,7 +122,7 @@ internal fun generateObject(blockTypeName: String, attributes: Map<String, Any>)
         .addSuperclassConstructorParameter("\"$blockTypeName\"")
 
     for ((attributeName, attribute) in attributes) {
-        blockTypeClassBuilder.addAttribute(attributeName, attribute)
+        blockTypeClassBuilder.addAttribute(attributeName, attribute, null)
     }
 
     return blockTypeClassBuilder.build()
@@ -144,17 +143,14 @@ internal fun TypeSpec.Builder.addBlockTypeFunction(blockTypeName: String): TypeS
     )
 }
 
-internal fun generateBlockTypes(blockTypes: Map<String, BlockType>, resourceClassBuilder: TypeSpec.Builder) {
+internal fun TypeSpec.Builder.generateBlockTypes(blockTypes: Map<String, BlockType>) {
     for ((blockTypeName, blockType) in blockTypes) {
         if (blockType.nesting_mode == "map") {
-            // TODO support map
-            continue
+            // Map nesting mode is not used in AWS, Azure and GCP.
+            throw IllegalStateException("Map nesting mode is not supported.")
         }
-        if (blockType.block.attributes == null) {
-            // TODO support other cases
-            continue
-        }
-        resourceClassBuilder.addType(generateBlockTypeClass(blockTypeName, blockType.block.attributes))
-        resourceClassBuilder.addBlockTypeFunction(blockTypeName)
+
+        this.addType(generateBlockTypeClass(blockTypeName, blockType.block))
+        this.addBlockTypeFunction(blockTypeName)
     }
 }
