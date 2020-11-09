@@ -1,4 +1,4 @@
-rootProject.name = "example"
+rootProject.name = "providers"
 
 pluginManagement {
     repositories {
@@ -7,3 +7,5 @@ pluginManagement {
     }
 }
 include(":aws")
+include(":azure")
+include(":gcp")

@@ -44,9 +44,13 @@ open class TerraformKt {
     }
 }
 
-var terraformKt = TerraformKt()
+internal var Project.terraformKt: TerraformKt
+    get() = this.myExt("terraformkt")
+    set(value) {
+        this.myExt["terraformkt"] = value
+    }
 
 @TerraformKtDSLTag
-fun terraformKt(configure: TerraformKt.() -> Unit) {
+fun Project.terraformKt(configure: TerraformKt.() -> Unit) {
     terraformKt.configure()
 }

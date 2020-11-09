@@ -16,11 +16,11 @@ open class DownloadTerraformTask : DefaultTask() {
 
     @get:Input
     val version: String?
-        get() = terraformKt.terraform.version
+        get() = project.terraformKt.terraform.version
 
     @get:InputDirectory
     val downloadPath: File
-        get() = terraformKt.terraform.getDownloadPathOrDefault(project)
+        get() = project.terraformKt.terraform.getDownloadPathOrDefault(project)
 
     @get:OutputFile
     val terraformFile: File?

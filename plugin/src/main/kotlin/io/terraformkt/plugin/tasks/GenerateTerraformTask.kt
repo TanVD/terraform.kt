@@ -3,9 +3,7 @@ package io.terraformkt.plugin.tasks
 import io.terraformkt.plugin.generators.TerraformGenerator
 import io.terraformkt.plugin.terraformKt
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 
 open class GenerateTerraformTask : DefaultTask() {
@@ -15,11 +13,11 @@ open class GenerateTerraformTask : DefaultTask() {
 
     @get:Input
     val providerName: String?
-        get() = terraformKt.provider.name
+        get() = project.terraformKt.provider.name
 
     @get:OutputDirectory
     val generationPath: File
-        get() = terraformKt.getGenerationPathOrDefault(project)
+        get() = project.terraformKt.getGenerationPathOrDefault(project)
 
     @TaskAction
     fun act() {
@@ -27,7 +25,7 @@ open class GenerateTerraformTask : DefaultTask() {
 
         try {
             TerraformGenerator(
-                terraformKt.terraform.getDownloadPathOrDefault(project).resolve("schema.json"),
+                project.terraformKt.terraform.getDownloadPathOrDefault(project).resolve("schema.json"),
                 generationPath,
                 providerName!!
             ).generate()

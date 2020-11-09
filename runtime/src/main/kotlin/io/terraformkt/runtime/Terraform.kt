@@ -5,32 +5,32 @@ import io.terraformkt.wrapper.TerraformWrapper
 import java.io.File
 
 class Terraform(
-    private val terraformVersion: String = "0.13.0",
-    private val terraformPath: File = File(System.getProperty("user.home")).resolve(".terraform/$terraformVersion/terraform"),
-    private val terraformFilesPath: File = File(System.getProperty("user.dir")).resolve("terraform")
+    private val version: String = "0.13.0",
+    private val binPath: File = File(System.getProperty("user.home")).resolve(".terraform/$version/terraform"),
+    private val filesPath: File = File(System.getProperty("user.dir")).resolve("terraform")
 ) {
     init {
-        TerraformWrapper.downloadTerraform(terraformPath.parentFile, terraformVersion)
+        TerraformWrapper.downloadTerraform(binPath.parentFile, version)
     }
 
-    private val terraformFiles = ArrayList<TFFile>()
+    private val files = ArrayList<TFFile>()
 
     fun addFiles(vararg tfFiles: TFFile) {
-        terraformFiles.addAll(tfFiles.asIterable())
+        files.addAll(tfFiles.asIterable())
     }
 
-    fun tf(name: String, configure: TFFile.() -> Unit) = terraformFiles.add(TFFile(name).apply(configure))
+    fun tf(name: String, configure: TFFile.() -> Unit) = files.add(TFFile(name).apply(configure))
 
     fun apply() {
-        TerraformWrapper.terraformApply(terraformFiles, terraformPath, terraformFilesPath)
+        TerraformWrapper.terraformApply(files, binPath, filesPath)
     }
 
     fun plan() {
-        TerraformWrapper.terraformPlan(terraformFiles, terraformPath, terraformFilesPath)
+        TerraformWrapper.terraformPlan(files, binPath, filesPath)
     }
 
-    fun generate(directoryToWriteFiles: File = terraformFilesPath) {
-        TerraformWrapper.terraformGenerate(terraformFiles, directoryToWriteFiles)
+    fun generate(directoryToWriteFiles: File = filesPath) {
+        TerraformWrapper.terraformGenerate(files, directoryToWriteFiles)
     }
 }
 

@@ -15,15 +15,15 @@ open class DownloadSchemaTask : DefaultTask() {
 
     @get:Input
     val providerName: String?
-        get() = terraformKt.provider.name
+        get() = project.terraformKt.provider.name
 
     @get:Input
     val providerVersion: String?
-        get() = terraformKt.provider.version
+        get() = project.terraformKt.provider.version
 
     @get:InputDirectory
     val downloadPath: File
-        get() = terraformKt.terraform.getDownloadPathOrDefault(project)
+        get() = project.terraformKt.terraform.getDownloadPathOrDefault(project)
 
     @TaskAction
     fun download() {

@@ -10,9 +10,11 @@ import org.gradle.kotlin.dsl.get
 @Suppress("unused")
 class TerraformKtPlugin : Plugin<Project> {
     override fun apply(target: Project) {
+        target.terraformKt = TerraformKt()
+
         target.afterEvaluate {
             target.mySourceSets.apply {
-                this["main"].kotlin.srcDir(terraformKt.getGenerationPathOrDefault(target))
+                this["main"].kotlin.srcDir(it.terraformKt.getGenerationPathOrDefault(target))
             }
 
             target.configurations.getByName("implementation").dependencies.add(
