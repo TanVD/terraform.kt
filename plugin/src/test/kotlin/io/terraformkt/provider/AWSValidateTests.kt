@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 open class AWSValidateTests : BaseValidateTests("aws") {
+    private val kotlinDaemonHeapSizeOption = "-Dkotlin.daemon.jvm.options=-Xmx3g"
     private val projectDir = File("../example")
     private val runner: GradleRunner
         get() = GradleRunner
             .create()
             .withDebug(true)
             .withProjectDir(projectDir)
+            .withArguments(kotlinDaemonHeapSizeOption)
 
     private val data = setOf(
         "instance",
