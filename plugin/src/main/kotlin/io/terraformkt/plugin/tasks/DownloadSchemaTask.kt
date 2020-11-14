@@ -30,6 +30,6 @@ open class DownloadSchemaTask : DefaultTask() {
         require(providerName != null) { "provider name is not specified" }
         require(providerVersion != null) { "provider version is not specified " }
 
-        TerraformWrapper.downloadSchema(downloadPath, providerName!!, providerVersion!!)
+        TerraformWrapper.Download.schema(downloadPath, providerName!!, providerVersion!!)
     }
 }

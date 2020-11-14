@@ -1,10 +1,8 @@
 package io.terraformkt.provider
 
 import io.terraformkt.BaseValidateTests
-import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.io.File
 
 open class AWSValidateTests : BaseValidateTests("aws") {
     private val data = setOf(

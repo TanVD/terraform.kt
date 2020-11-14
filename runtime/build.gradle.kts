@@ -3,17 +3,6 @@ import tanvd.kosogor.proxy.publishJar
 group = rootProject.group
 version = rootProject.version
 
-buildscript {
-    repositories {
-        mavenLocal()
-    }
-}
-
-repositories {
-    mavenLocal()
-    jcenter()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
 
@@ -22,7 +11,14 @@ dependencies {
 }
 
 publishJar {
-    publication {
-        artifactId = "runtime"
+    bintray {
+        username = "tanvd"
+        repository = "io.terraformkt"
+        info {
+            description = "Terraform.kt runtime for Terraform execution"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
+        }
     }
 }

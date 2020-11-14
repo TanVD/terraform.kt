@@ -10,7 +10,7 @@ class Terraform(
     private val filesPath: File = File(System.getProperty("user.dir")).resolve("terraform")
 ) {
     init {
-        TerraformWrapper.downloadTerraform(binPath.parentFile, version)
+        TerraformWrapper.Download.terraform(binPath.parentFile, version)
     }
 
     private val files = ArrayList<TFFile>()
@@ -22,15 +22,15 @@ class Terraform(
     fun tf(name: String, configure: TFFile.() -> Unit) = files.add(TFFile(name).apply(configure))
 
     fun apply() {
-        TerraformWrapper.terraformApply(files, binPath, filesPath)
+        TerraformWrapper.Operation.apply(files, binPath, filesPath)
     }
 
     fun plan() {
-        TerraformWrapper.terraformPlan(files, binPath, filesPath)
+        TerraformWrapper.Operation.plan(files, binPath, filesPath)
     }
 
     fun generate(directoryToWriteFiles: File = filesPath) {
-        TerraformWrapper.terraformGenerate(files, directoryToWriteFiles)
+        TerraformWrapper.Operation.generate(files, directoryToWriteFiles)
     }
 }
 

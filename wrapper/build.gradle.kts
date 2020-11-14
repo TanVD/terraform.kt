@@ -3,17 +3,6 @@ import tanvd.kosogor.proxy.publishJar
 group = rootProject.group
 version = rootProject.version
 
-buildscript {
-    repositories {
-        mavenLocal()
-    }
-}
-
-repositories {
-    mavenLocal()
-    jcenter()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
 
@@ -24,8 +13,16 @@ dependencies {
     implementation("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-30")
 }
 
+
 publishJar {
-    publication {
-        artifactId = "wrapper"
+    bintray {
+        username = "tanvd"
+        repository = "io.terraformkt"
+        info {
+            description = "Terraform.kt wrapper for Terraform"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
+        }
     }
 }

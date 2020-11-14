@@ -19,10 +19,6 @@ val SourceSet.kotlin: SourceDirectorySet
         .getPlugin(KotlinSourceSet::class.java)
         .kotlin
 
-
-fun SourceSet.kotlin(action: SourceDirectorySet.() -> Unit) =
-    kotlin.action()
-
 //Generated accessors to use in a plugin
 internal inline fun <reified T : Any> Project.myExtByName(name: String): T = extensions.getByName<T>(name)
 

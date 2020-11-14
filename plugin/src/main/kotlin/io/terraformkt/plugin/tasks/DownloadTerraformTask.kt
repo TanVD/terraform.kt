@@ -15,24 +15,23 @@ open class DownloadTerraformTask : DefaultTask() {
     }
 
     @get:Input
-    val version: String?
+    val version: String
         get() = project.terraformKt.terraform.version
 
     @get:InputDirectory
     val downloadPath: File
         get() = project.terraformKt.terraform.getDownloadPathOrDefault(project)
 
+    @Suppress("unused")
     @get:OutputFile
-    val terraformFile: File?
+    val terraformFile: File
         get() = downloadPath.resolve("terraform")
 
     @TaskAction
     fun download() {
-        require(version != null) { "terraform version is not specified" }
-
         logger.lifecycle("Downloading terraform version $version")
 
-        TerraformWrapper.downloadTerraform(downloadPath, version!!)
+        TerraformWrapper.Download.terraform(downloadPath, version)
 
         logger.lifecycle("Terraform version $version successfully downloaded")
     }

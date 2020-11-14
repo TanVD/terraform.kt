@@ -27,7 +27,18 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.6.0")
 }
 
-publishJar {}
+publishJar {
+    bintray {
+        username = "tanvd"
+        repository = "io.terraformkt"
+        info {
+            description = "Terraform.kt Gradle plugin"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
+        }
+    }
+}
 
 publishPlugin {
     id = "io.terraformkt"

@@ -3,24 +3,21 @@ import tanvd.kosogor.proxy.publishJar
 group = rootProject.group
 version = rootProject.version
 
-buildscript {
-    repositories {
-        mavenLocal()
-    }
-}
-
-repositories {
-    mavenLocal()
-    jcenter()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 }
 
+
 publishJar {
-    publication {
-        artifactId = "entities"
+    bintray {
+        username = "tanvd"
+        repository = "io.terraformkt"
+        info {
+            description = "Terraform.kt entities interfaces"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            githubRepo = "https://github.com/anstkras/terraform.kt"
+            labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
+        }
     }
 }

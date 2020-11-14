@@ -5,7 +5,7 @@ import org.codehaus.plexus.archiver.zip.ZipUnArchiver
 import org.codehaus.plexus.logging.console.ConsoleLogger
 import java.io.File
 
-enum class Archive(val extension: String) {
+internal enum class Archive(val extension: String) {
     ZIP("zip") {
         override fun getUnarchiver(from: File) = ZipUnArchiver(from)
     };

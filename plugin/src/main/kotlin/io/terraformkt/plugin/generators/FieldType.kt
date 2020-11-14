@@ -37,7 +37,7 @@ enum class FieldTypeWithDelegate(val delegateName: String, val typeName: TypeNam
 
 enum class FieldTypeWithoutDelegate(val typeName: TypeName) : FieldType {
     OBJECT_LIST(HCLEntity.Inner::class.asClassName()),
-    STRING_MAP(HCLMapField::class.asClassName().parameterizedBy(com.squareup.kotlinpoet.STRING)),
+    STRING_MAP(HCLMapField::class.asClassName().parameterizedBy(STRING)),
     NUMBER_MAP(HCLMapField::class.asClassName().parameterizedBy(INT)),
     BOOL_MAP(HCLMapField::class.asClassName().parameterizedBy(BOOLEAN));
 
