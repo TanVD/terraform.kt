@@ -16,7 +16,7 @@ publishJar {
         repository = "io.terraformkt"
         info {
             description = "Terraform.kt runtime for Terraform execution"
-            githubRepo = "https://github.com/anstkras/terraform.kt"
+            vcsUrl = "https://github.com/anstkras/terraform.kt"
             githubRepo = "https://github.com/anstkras/terraform.kt"
             labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
         }

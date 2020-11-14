@@ -20,7 +20,7 @@ publishJar {
         repository = "io.terraformkt"
         info {
             description = "Terraform.kt wrapper for Terraform"
-            githubRepo = "https://github.com/anstkras/terraform.kt"
+            vcsUrl = "https://github.com/anstkras/terraform.kt"
             githubRepo = "https://github.com/anstkras/terraform.kt"
             labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
         }

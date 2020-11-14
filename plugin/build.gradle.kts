@@ -33,7 +33,7 @@ publishJar {
         repository = "io.terraformkt"
         info {
             description = "Terraform.kt Gradle plugin"
-            githubRepo = "https://github.com/anstkras/terraform.kt"
+            vcsUrl = "https://github.com/anstkras/terraform.kt"
             githubRepo = "https://github.com/anstkras/terraform.kt"
             labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
         }
@@ -45,6 +45,13 @@ publishPlugin {
     displayName = "Terraform.kt"
     implementationClass = "io.terraformkt.plugin.TerraformKtPlugin"
     version = project.version.toString()
+
+    info {
+        website = "https://github.com/anstkras/terraform.kt"
+        vcsUrl = "https://github.com/anstkras/terraform.kt"
+        description = "Terraform DSL for Kotlin"
+        tags.addAll(listOf("kotlin", "terraform", "web", "devops"))
+    }
 }
 
 tasks.withType<Test> {
