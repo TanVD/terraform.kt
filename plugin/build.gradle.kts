@@ -38,6 +38,7 @@ publishPlugin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    maxHeapSize = "4g"
 
     testLogging {
         events("passed", "skipped", "failed")

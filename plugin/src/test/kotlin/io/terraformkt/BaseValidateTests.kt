@@ -4,16 +4,17 @@ import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 
 abstract class BaseValidateTests(private val provider: String) {
-    private val projectDir = File("../example")
-    private val runner: GradleRunner
+    private val kotlinDaemonHeapSizeOption = "-Dkotlin.daemon.jvm.options=-Xmx4G\n"
+    protected val runner: GradleRunner
         get() = GradleRunner
             .create()
             .withDebug(true)
-            .withProjectDir(projectDir)
+            .withProjectDir(File("../example"))
+            .withArguments(kotlinDaemonHeapSizeOption)
 
     /** Get actual generated file */
     protected fun actual(file: String): String {
-        return File(projectDir, "/$provider/terraform/$file.tf").readText()
+        return File(File("../example"), "/$provider/terraform/$file.tf").readText()
     }
 
     /** Get expected content of Terraform file */

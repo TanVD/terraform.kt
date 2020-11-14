@@ -1,6 +1,6 @@
 name: Gradle Build
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   build:
@@ -16,5 +16,10 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Build with Gradle
+      - name: Build plugin
+        run: ./gradlew build -x test --console=plain
+      - name: Publish plugin
+        run: ./gradlew publishToMavenLocal -x test --console=plain
+      - name: Build providers
+        working-directory: providers
         run: ./gradlew build -x test --console=plain
