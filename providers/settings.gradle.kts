@@ -2,7 +2,6 @@ rootProject.name = "providers"
 
 pluginManagement {
     repositories {
-        mavenLocal()
         gradlePluginPortal()
     }
 }
