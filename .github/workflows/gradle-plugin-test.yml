@@ -1,4 +1,4 @@
-name: Gradle Test
+name: Gradle Plugin Test
 
 on: [ push, pull_request ]
 

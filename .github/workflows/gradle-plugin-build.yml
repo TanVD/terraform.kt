@@ -1,4 +1,4 @@
-name: Gradle Build
+name: Gradle Plugin Build
 
 on: [ push, pull_request ]
 

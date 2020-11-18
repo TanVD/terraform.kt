@@ -1,4 +1,4 @@
-name: Gradle Release
+name: Gradle Plugin Release
 
 on: [ workflow_dispatch ]
 
