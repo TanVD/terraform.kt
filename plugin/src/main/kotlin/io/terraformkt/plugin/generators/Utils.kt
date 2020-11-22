@@ -43,13 +43,18 @@ internal fun TypeSpec.Builder.addAttribute(attributeName: String, attribute: Any
             .mutable()
         if (description != null) {
             try {
-                propertyBuilder.addKdoc(description)
+                propertyBuilder.addEscapedKdoc(description)
             } catch (e: Exception) {
                 // TODO escape %
             }
         }
         this.addProperty(propertyBuilder.build())
     }
+}
+
+private fun PropertySpec.Builder.addEscapedKdoc(kdoc: String) {
+    val escapedKdoc = kdoc.replace("*/", "`*`/").replace("/*", "/`*`")
+    this.addKdoc(escapedKdoc)
 }
 
 private fun getListObjectAttributes(type: ArrayList<*>): Map<String, Any> {
