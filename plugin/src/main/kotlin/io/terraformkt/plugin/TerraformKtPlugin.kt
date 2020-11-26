@@ -27,7 +27,7 @@ class TerraformKtPlugin : Plugin<Project> {
         val generateTerraform = target.tasks.create("generateTerraform", GenerateTerraformTask::class.java).dependsOn(downloadSchema)
 
         target.afterEvaluate {
-            target.tasks["classes"].dependsOn(generateTerraform)
+            target.tasks["classes"].dependsOn(generateTerraform).mustRunAfter(generateTerraform)
         }
     }
 }
