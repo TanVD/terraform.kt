@@ -1,4 +1,5 @@
 import io.terraformkt.plugin.terraformKt
+import tanvd.kosogor.accessors.jar
 import tanvd.kosogor.proxy.publishJar
 
 val providerVersion = "3.14.1"

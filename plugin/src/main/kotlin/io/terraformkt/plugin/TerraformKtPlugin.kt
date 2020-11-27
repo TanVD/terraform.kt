@@ -18,7 +18,7 @@ class TerraformKtPlugin : Plugin<Project> {
             }
 
             target.configurations.getByName("implementation").dependencies.add(
-                target.dependencies.add("implementation", "io.terraformkt:entities:0.1.0")
+                target.dependencies.add("implementation", "io.terraformkt:entities:0.1.1")
             )
         }
 
