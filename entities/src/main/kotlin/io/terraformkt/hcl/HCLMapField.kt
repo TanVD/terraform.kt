@@ -5,7 +5,7 @@ import io.terraformkt.utils.withIndent
 open class HCLMapField<T>(name: String, private val map: Map<String, T>) : HCLEntity.Inner(name) {
     override fun render(): String {
         return """
-            |${tf_name} {
+            |${tf_name} = {
             |${renderMap(map)}
             |}
             """.trimMargin()
@@ -13,7 +13,7 @@ open class HCLMapField<T>(name: String, private val map: Map<String, T>) : HCLEn
 
     companion object {
         fun renderMap(map: Map<String, *>): String {
-            return map.entries.joinToString(separator = "\n") { (key, value) -> "$key = \"$value\"" }.withIndent()
+            return map.entries.joinToString(separator = "\n") { (key, value) -> "\"$key\" = \"$value\"" }.withIndent()
         }
     }
 }
