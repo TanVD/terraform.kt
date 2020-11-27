@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 group = "io.terraformkt"
-version = "0.1.1"
+version = "0.1.2"
 
 plugins {
     id("tanvd.kosogor") version "1.0.10" apply true
@@ -46,5 +46,10 @@ subprojects {
                 enabled = false
             }
         }
+    }
+
+    afterEvaluate {
+        System.setProperty("gradle.publish.key", System.getenv("gradle_publish_key") ?: "")
+        System.setProperty("gradle.publish.secret", System.getenv("gradle_publish_secret") ?: "")
     }
 }

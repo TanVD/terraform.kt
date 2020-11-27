@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 group = "io.terraformkt.providers"
-version = "0.1.1"
+version = "0.1.2"
 
 plugins {
     id("tanvd.kosogor") version "1.0.10" apply true
     kotlin("jvm") version "1.3.72" apply true
-    id("io.terraformkt") version "0.1.1" apply false
+    id("io.terraformkt") version "0.1.2" apply false
 
 }
 
@@ -35,6 +35,6 @@ subprojects {
     dependencies {
         implementation(kotlin("stdlib"))
 
-        implementation("io.terraformkt:runtime:0.1.1")
+        implementation("io.terraformkt:runtime:0.1.2")
     }
 }
