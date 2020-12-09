@@ -85,7 +85,10 @@ class ResourcesAndDataGenerator(
                         receiver = TypeVariableName(className)
                     )
                 )
-                .addStatement("%N(%N(id).apply(configure))", TFFile::add.name, className)
+                .addStatement("val element = %N(id).apply(configure)", className)
+                .addStatement("%N(element)", TFFile::add.name)
+                .addStatement("return element")
+                .returns(TypeVariableName(className))
                 .build()
         )
     }
