@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 group = "io.terraformkt"
-version = "0.1.3"
+version = "0.1.4"
 
 plugins {
     id("tanvd.kosogor") version "1.0.10" apply true
