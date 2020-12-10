@@ -1,8 +1,8 @@
 package io.terraformkt.hcl
 
-import io.terraformkt.utils.isLink
+import io.terraformkt.utils.anyToText
 import io.terraformkt.utils.link
-import io.terraformkt.utils.unlink
+import io.terraformkt.utils.toText
 import io.terraformkt.utils.withIndent
 
 
@@ -28,10 +28,6 @@ class HCLEntityField<T : HCLEntity>(name: String, owner: HCLEntity, value: T?) :
 
 /** Field with text owned by HCL entity */
 class HCLTextField(name: String, owner: HCLEntity, value: String?) : HCLField<String>(name, owner, value) {
-    companion object {
-        fun toText(value: String) = if (isLink(value)) unlink(value) else "\"$value\""
-    }
-
     override fun render(): String {
         return "$hcl_name = ${toText(value!!)}"
     }
@@ -41,11 +37,9 @@ class HCLTextField(name: String, owner: HCLEntity, value: String?) : HCLField<St
 class HCLTextListField(name: String, owner: HCLEntity, value: Array<String>?) : HCLField<Array<String>>(name, owner, value) {
     override fun render(): String {
         return "$hcl_name = ${
-        value!!.sortedArray().joinToString(prefix = "[", postfix = "]") {
-            HCLTextField.toText(
-                it
-            )
-        }
+            value!!.sortedArray().joinToString(prefix = "[", postfix = "]") {
+                toText(it)
+            }
         }"
     }
 }
@@ -82,20 +76,10 @@ class HCLIntListField(name: String, owner: HCLEntity, value: Array<Int>?) : HCLF
 class HCLAnyListField(name: String, owner: HCLEntity, value: Array<Any>?) : HCLField<Array<Any>>(name, owner, value) {
     override fun render(): String {
         return "$hcl_name = ${
-        value!!.joinToString(prefix = "[", postfix = "]") {
-            anyToText(it)
-        }
+            value!!.joinToString(prefix = "[", postfix = "]") {
+                anyToText(it)
+            }
         }"
     }
 }
 
-// Suppose any can be int, string, bool and map.
-private fun anyToText(any: Any): String {
-    if (any is String) {
-        return HCLTextField.toText(any)
-    }
-    if (any is Map<*, *>) {
-        return "{${HCLMapField.renderMap(any as Map<String, Any>)}}"
-    }
-    return "$any"
-}

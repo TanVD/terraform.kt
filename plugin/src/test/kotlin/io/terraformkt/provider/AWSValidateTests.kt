@@ -8,7 +8,8 @@ open class AWSValidateTests : BaseValidateTests("aws") {
     private val data = setOf(
         "instance",
         "s3_bucket",
-        "security_group"
+        "security_group",
+        "api_gateway"
     )
 
     @Test

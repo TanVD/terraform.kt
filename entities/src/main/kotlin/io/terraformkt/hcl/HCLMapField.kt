@@ -1,5 +1,6 @@
 package io.terraformkt.hcl
 
+import io.terraformkt.utils.anyToText
 import io.terraformkt.utils.withIndent
 
 open class HCLMapField<T>(name: String, private val map: Map<String, T>) : HCLEntity.Inner(name) {
@@ -13,7 +14,7 @@ open class HCLMapField<T>(name: String, private val map: Map<String, T>) : HCLEn
 
     companion object {
         fun renderMap(map: Map<String, *>): String {
-            return map.entries.joinToString(separator = "\n") { (key, value) -> "\"$key\" = \"$value\"" }.withIndent()
+            return map.entries.joinToString(separator = "\n") { (key, value) -> "\"$key\" = ${anyToText(value!!)}" }.withIndent()
         }
     }
 }

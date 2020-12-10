@@ -4,4 +4,5 @@ fun main() {
     instance()
     s3Bucket()
     securityGroup()
+    apiGateway()
 }
