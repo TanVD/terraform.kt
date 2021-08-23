@@ -51,7 +51,7 @@ subprojects {
     }
 
     afterEvaluate {
-        System.setProperty("gradle.publish.key", System.getenv("gradle_publish_key") ?: "")
-        System.setProperty("gradle.publish.secret", System.getenv("gradle_publish_secret") ?: "")
+        System.setProperty("gradle.publish.key", System.getenv("GRADLE_PUBLISH_KEY") ?: "")
+        System.setProperty("gradle.publish.secret", System.getenv("GRADLE_PUBLISH_SECRET") ?: "")
     }
 }

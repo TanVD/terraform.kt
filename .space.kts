@@ -29,6 +29,9 @@ job("Terraform.kt / Plugin / Release") {
     }
 
     container("openjdk:11") {
+        env["GRADLE_PUBLISH_KEY"] = Secrets("gradle_publish_key")
+        env["GRADLE_PUBLISH_SECRET"] = Secrets("gradle_publish_secret")
+
         shellScript {
             content = """
               ./gradlew publish publishPlugins --console=plain
