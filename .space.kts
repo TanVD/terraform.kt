@@ -31,7 +31,7 @@ job("Terraform.kt / Plugin / Release") {
     container("openjdk:11") {
         shellScript {
             content = """
-              ./gradlew bintrayUpload publishPlugins --console=plain
+              ./gradlew publish publishPlugins --console=plain
           """
         }
     }
