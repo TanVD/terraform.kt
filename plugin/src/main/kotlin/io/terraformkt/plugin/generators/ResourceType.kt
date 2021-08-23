@@ -1,9 +1,7 @@
 package io.terraformkt.plugin.generators
 
 import com.squareup.kotlinpoet.TypeSpec
-import io.terraformkt.terraform.TFData
-import io.terraformkt.terraform.TFProvider
-import io.terraformkt.terraform.TFResource
+import io.terraformkt.terraform.*
 
 enum class ResourceType(val firstLetter: Char) {
     DATA('d'),

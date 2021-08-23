@@ -1,11 +1,9 @@
 package io.terraformkt.plugin.tasks
 
-import io.terraformkt.wrapper.TerraformWrapper
 import io.terraformkt.plugin.terraformKt
+import io.terraformkt.wrapper.TerraformWrapper
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 
 open class DownloadSchemaTask : DefaultTask() {

@@ -1,8 +1,6 @@
 package io.terraformkt.plugin
 
-import io.terraformkt.plugin.tasks.DownloadSchemaTask
-import io.terraformkt.plugin.tasks.DownloadTerraformTask
-import io.terraformkt.plugin.tasks.GenerateTerraformTask
+import io.terraformkt.plugin.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.get

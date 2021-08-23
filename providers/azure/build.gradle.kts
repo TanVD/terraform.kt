@@ -1,7 +1,7 @@
 import io.terraformkt.plugin.terraformKt
 import tanvd.kosogor.proxy.publishJar
 
-val providerVersion = "2.35.0"
+val providerVersion = "2.56.0"
 
 group = rootProject.group
 version = "$providerVersion-${rootProject.version}"

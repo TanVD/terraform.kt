@@ -1,9 +1,6 @@
 package io.terraformkt.hcl
 
-import io.terraformkt.utils.anyToText
-import io.terraformkt.utils.link
-import io.terraformkt.utils.toText
-import io.terraformkt.utils.withIndent
+import io.terraformkt.utils.*
 
 
 /** Field of HCL entity */

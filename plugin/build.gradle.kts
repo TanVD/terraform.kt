@@ -1,4 +1,3 @@
-import tanvd.kosogor.proxy.publishJar
 import tanvd.kosogor.proxy.publishPlugin
 
 group = rootProject.group
@@ -27,18 +26,6 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.6.0")
 }
 
-publishJar {
-    bintray {
-        username = "tanvd"
-        repository = "io.terraformkt"
-        info {
-            description = "Terraform.kt Gradle plugin"
-            vcsUrl = "https://github.com/anstkras/terraform.kt"
-            githubRepo = "https://github.com/anstkras/terraform.kt"
-            labels.addAll(listOf("kotlin", "terraform", "web", "devops"))
-        }
-    }
-}
 
 publishPlugin {
     id = "io.terraformkt"
