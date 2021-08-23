@@ -2,6 +2,13 @@
 
 Terraform.kt project aims to bring all the advantages of using Kotlin language to the process of writing Terraform configuration files.
 
+Use terraform.kt in gradle via:
+```kotlin
+repositories {
+    maven(url = uri("https://packages.jetbrains.team/maven/p/ktls/maven"))
+}
+```
+
 ## Example
 For the example of generating and using Kotlin DSL see `example/aws` folder. 
 To generate Kotlin DSL files run
