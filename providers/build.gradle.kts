@@ -1,18 +1,18 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 group = "io.terraformkt.providers"
-version = "0.1.4"
+version = "0.1.5"
 
 plugins {
     id("tanvd.kosogor") version "1.0.10" apply true
-    kotlin("jvm") version "1.3.72" apply true
-    id("io.terraformkt") version "0.1.4" apply false
-
+    kotlin("jvm") version "1.5.21" apply true
+    id("io.terraformkt") version "0.1.5" apply false
+    `maven-publish`
 }
 
 allprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -31,10 +31,27 @@ subprojects {
         }
     }
 
+    publishJar {  }
+
+    publishing {
+        repositories {
+            maven {
+                name = "SpacePackages"
+                url = uri("https://packages.jetbrains.team/maven/p/ktls/maven")
+
+                credentials {
+                    username = System.getenv("JB_SPACE_CLIENT_ID")
+                    password = System.getenv("JB_SPACE_CLIENT_SECRET")
+                }
+            }
+        }
+    }
+
+
 
     dependencies {
         implementation(kotlin("stdlib"))
 
-        implementation("io.terraformkt:runtime:0.1.4")
+        implementation("io.terraformkt:runtime:0.1.5")
     }
 }

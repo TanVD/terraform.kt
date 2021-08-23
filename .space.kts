@@ -21,6 +21,22 @@ job("Terraform.kt / Plugin / Test") {
     }
 }
 
+job("Terraform.kt / Plugin / Release") {
+    startOn {
+        gitPush {
+            enabled = false
+        }
+    }
+
+    container("openjdk:11") {
+        shellScript {
+            content = """
+              ./gradlew bintrayUpload publishPlugins --console=plain
+          """
+        }
+    }
+}
+
 job("Terraform.kt / Providers / Build") {
     container("openjdk:11") {
         workDir = "providers"
@@ -39,6 +55,7 @@ job("Terraform.kt / Providers / Release") {
             enabled = false
         }
     }
+
     container("openjdk:11") {
         workDir = "providers"
 
