@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+import tanvd.kosogor.proxy.publishJar
 
 group = "io.terraformkt.providers"
 version = "0.1.5"
@@ -13,6 +14,7 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
+        maven(url = uri("https://packages.jetbrains.team/maven/p/ktls/maven"))
     }
 }
 

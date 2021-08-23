@@ -12,16 +12,3 @@ terraformKt {
         version = providerVersion
     }
 }
-
-publishJar {
-    bintray {
-        username = "tanvd"
-        repository = "io.terraformkt"
-        info {
-            description = "Azure provider for terraform.kt"
-            vcsUrl = "https://github.com/anstkras/terraform.kt"
-            githubRepo = "https://github.com/anstkras/terraform.kt"
-            labels.addAll(listOf("kotlin", "terraform", "azure", "web", "devops"))
-        }
-    }
-}
