@@ -1,3 +1,5 @@
+import runtime.reactive.trigger
+
 job("Terraform.kt / Plugin / Build") {
     container("openjdk:11") {
         shellScript {
@@ -31,15 +33,20 @@ job("Terraform.kt / Providers / Build") {
     }
 }
 
-job("Terraform.kt / Providers / Test") {
+job("Terraform.kt / Providers / Release") {
+    startOn {
+        gitPush {
+            enabled = false
+        }
+    }
     container("openjdk:11") {
         workDir = "providers"
 
         shellScript {
             content = """
-              ./gradlew publishToMavenLocal --console=plain
-              ./gradlew test --console=plain 
+              ./gradlew publish --console=plain
           """
         }
     }
 }
+
