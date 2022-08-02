@@ -10,15 +10,16 @@ import java.net.URL
 object TerraformWrapper {
     object Download {
         fun terraform(downloadPath: File, version: String) {
-            val terraformFile = downloadPath.resolve("terraform")
-            if (terraformFile.exists()) {
+            val terraformFileUnix = downloadPath.resolve("terraform")
+            val terraformFileWindows = downloadPath.resolve("terraform.exe")
+            if (terraformFileUnix.exists() || terraformFileWindows.exists()) {
                 return
             }
 
             Downloads.download(URL("https://releases.hashicorp.com/terraform/$version/terraform_${version}_$os.zip"), downloadPath, Archive.ZIP)
 
             if (Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_UNIX)) {
-                CommandLine.execute("chmod", listOf("+x", terraformFile.absolutePath), downloadPath, false)
+                CommandLine.execute("chmod", listOf("+x", terraformFileUnix.absolutePath), downloadPath, false)
             }
         }
 
